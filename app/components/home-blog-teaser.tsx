@@ -42,6 +42,7 @@ export function HomeBlogTeaser() {
               delay: staggerDelay(reduced, i),
               ...softTransition(reduced),
             }}
+            className="bg-background"
           >
             <Link
               href={`/blog/${post.slug}`}

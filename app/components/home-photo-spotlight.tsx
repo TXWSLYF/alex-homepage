@@ -4,6 +4,7 @@ import { photoSpotlightItems } from "@/content/photos";
 import { softTransition, staggerDelay } from "@/lib/motion-presets";
 import Link from "next/link";
 import { motion, useReducedMotion } from "motion/react";
+import { ArrowUpRight } from "lucide-react";
 
 export function HomePhotoSpotlight() {
   const reduced = useReducedMotion();
@@ -24,9 +25,10 @@ export function HomePhotoSpotlight() {
         </div>
         <Link
           href="/gallery"
-          className="mt-4 text-sm font-medium text-brand hover:underline sm:mt-0"
+          className="mt-4 inline-flex items-center gap-1 text-sm font-medium text-brand hover:underline sm:mt-0"
         >
           查看图集
+          <ArrowUpRight className="h-4 w-4" aria-hidden />
         </Link>
       </div>
 
