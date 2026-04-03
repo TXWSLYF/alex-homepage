@@ -48,7 +48,7 @@ function navLinkActive(pathname: string, href: string) {
 function NavDivider() {
   return (
     <span
-      className="mx-1 h-5 w-px shrink-0 self-center bg-zinc-200 dark:bg-zinc-600"
+      className="mx-1 h-5 w-px shrink-0 self-center bg-border-base/80"
       aria-hidden
     />
   );
@@ -71,13 +71,13 @@ export function FloatingNav({ serverDark }: { serverDark: boolean }) {
       className="pointer-events-none fixed top-4 left-1/2 z-50 flex -translate-x-1/2 justify-center px-4"
       aria-label="主导航"
     >
-      <div className="pointer-events-auto flex items-center gap-0.5 rounded-full border border-zinc-200/90 bg-white px-1.5 py-1 shadow-[0_8px_20px_-4px_rgba(0,0,0,0.08),0_4px_8px_-4px_rgba(0,0,0,0.06)] dark:border-zinc-700/80 dark:bg-zinc-900 dark:shadow-[0_8px_20px_-4px_rgba(0,0,0,0.45),0_4px_8px_-4px_rgba(0,0,0,0.35)]">
+      <div className="pointer-events-auto flex items-center gap-0.5 rounded-full border border-border-base/90 bg-background px-1.5 py-1 shadow-[0_8px_20px_-4px_rgba(0,0,0,0.08),0_4px_8px_-4px_rgba(0,0,0,0.06)] dark:border-border-base/80 dark:bg-surface-muted dark:shadow-[0_8px_20px_-4px_rgba(0,0,0,0.45),0_4px_8px_-4px_rgba(0,0,0,0.35)]">
         <Link
           href="/"
           className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full transition-colors ${
             homeActive
-              ? "bg-zinc-300 text-zinc-900 dark:bg-zinc-700 dark:text-zinc-50"
-              : "text-zinc-700 hover:bg-zinc-200 dark:text-zinc-300 dark:hover:bg-zinc-700"
+              ? "bg-ui-selected text-ui-selected-fg"
+              : "text-text-sub hover:bg-ui-hover active:bg-ui-active"
           }`}
           aria-current={homeActive ? "page" : undefined}
           title="首页"
@@ -96,8 +96,8 @@ export function FloatingNav({ serverDark }: { serverDark: boolean }) {
                 href={href}
                 className={`flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium transition-colors ${
                   active
-                    ? "bg-zinc-300 text-zinc-900 dark:bg-zinc-700 dark:text-zinc-50"
-                    : "text-zinc-800 hover:bg-zinc-200 dark:text-zinc-200 dark:hover:bg-zinc-700"
+                    ? "bg-ui-selected text-ui-selected-fg"
+                    : "text-text-sub hover:bg-ui-hover active:bg-ui-active"
                 }`}
                 aria-current={active ? "page" : undefined}
               >
@@ -118,7 +118,7 @@ export function FloatingNav({ serverDark }: { serverDark: boolean }) {
         <button
           type="button"
           onClick={toggleTheme}
-          className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-zinc-700 transition-colors hover:bg-zinc-200 dark:text-zinc-300 dark:hover:bg-zinc-700"
+          className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-text-sub transition-colors hover:bg-ui-hover active:bg-ui-active"
           title={dark ? "切换为浅色" : "切换为深色"}
           aria-label={dark ? "切换为浅色模式" : "切换为深色模式"}
           suppressHydrationWarning

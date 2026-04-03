@@ -3,26 +3,93 @@
 @custom-variant dark (&:where(.dark, .dark *));
 
 :root {
+  /* 背景与基础前景 */
   --background: #ffffff;
   --foreground: #171717;
-}
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  /* 文本颜色层级 */
+  --text-primary: #171717;
+  /* 重要标题 */
+  --text-secondary: #4b5563;
+  /* 正文/描述 */
+  /* 辅助/禁用/时间戳 */
+  --text-tertiary: #9ca3af;
+
+  /* 品牌主色 (以 Indigo 为例) */
+  --primary: #4f46e5;
+  --primary-foreground: #ffffff;
+
+  /* 边框与装饰 */
+  --border: #e5e7eb;
+  --muted: #f3f4f6;
+
+  /* 交互状态 (Interaction States) */
+  /* 使用透明度 (Ghost 风格)，可以完美适配各种背景底色 */
+  --action-hover: rgba(0, 0, 0, 0.05);
+  /* 悬浮态 */
+  --action-active: rgba(0, 0, 0, 0.08);
+  /* 点击/按下态 (Active/Pressed) */
+  --action-selected: rgba(0, 0, 0, 0.06);
+  /* 选中态 (Selected/Current) */
+
+  /* 对应的文字辅助色 */
+  /* 选中时的增强色，通常指向品牌色 */
+  --action-selected-fg: var(--primary);
 }
 
 html.dark {
   --background: #0a0a0a;
   --foreground: #ededed;
+
+  --text-primary: #ededed;
+  --text-secondary: #9ca3af;
+  --text-tertiary: #6b7280;
+
+  --primary: #6366f1;
+  --primary-foreground: #ffffff;
+
+  --border: #262626;
+  --muted: #171717;
+
+  /* 暗黑模式下，使用白色的透明度 */
+  --action-hover: rgba(255, 255, 255, 0.08);
+  --action-active: rgba(255, 255, 255, 0.12);
+  --action-selected: rgba(255, 255, 255, 0.1);
+
+  --action-selected-fg: var(--foreground);
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+@theme inline {
+  /* 基础映射 */
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+
+  /* 扩展颜色体系 */
+  --color-text-main: var(--text-primary);
+  --color-text-sub: var(--text-secondary);
+  --color-text-mute: var(--text-tertiary);
+
+  --color-brand: var(--primary);
+  --color-brand-fg: var(--primary-foreground);
+
+  --color-border-base: var(--border);
+  --color-surface-muted: var(--muted);
+
+  /* 将变量映射到 Tailwind 类名 */
+  --color-ui-hover: var(--action-hover);
+  --color-ui-active: var(--action-active);
+  --color-ui-selected: var(--action-selected);
+  --color-ui-selected-fg: var(--action-selected-fg);
+
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+/* 基础样式重置 */
+@layer base {
+  body {
+    @apply bg-background text-text-main antialiased transition-colors duration-200;
+  }
 }
 
 
