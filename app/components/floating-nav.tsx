@@ -10,6 +10,7 @@ import {
   UserCircle,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
+import { setClientTheme } from "@/lib/theme";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useCallback, useSyncExternalStore } from "react";
@@ -24,11 +25,11 @@ function subscribeTheme(callback: () => void) {
   return () => mo.disconnect();
 }
 
-function useIsDarkHtml() {
+function useIsDarkHtml(serverDark: boolean) {
   return useSyncExternalStore(
     subscribeTheme,
     () => document.documentElement.classList.contains("dark"),
-    () => false,
+    () => serverDark,
   );
 }
 
@@ -53,16 +54,16 @@ function NavDivider() {
   );
 }
 
-export function FloatingNav() {
+export function FloatingNav({ serverDark }: { serverDark: boolean }) {
   const pathname = usePathname();
-  const dark = useIsDarkHtml();
+  const dark = useIsDarkHtml(serverDark);
   const homeActive = navLinkActive(pathname, "/");
 
   const toggleTheme = useCallback(() => {
     const root = document.documentElement;
     const next = !root.classList.contains("dark");
     root.classList.toggle("dark", next);
-    localStorage.setItem("theme", next ? "dark" : "light");
+    setClientTheme(next ? "dark" : "light");
   }, []);
 
   return (
