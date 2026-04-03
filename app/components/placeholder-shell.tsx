@@ -7,7 +7,7 @@ export function PlaceholderShell({
 }) {
   return (
     <div className="relative z-1 flex min-h-0 flex-1 flex-col bg-zinc-50 font-sans dark:bg-black">
-      <main className="mx-auto flex w-full max-w-3xl flex-1 flex-col items-center justify-center px-6 pt-28 pb-24 text-center sm:px-16 bg-white dark:bg-black">
+      <main className="mx-auto flex w-full max-w-3xl flex-1 flex-col items-center justify-center px-6 pt-24 pb-24 text-center sm:px-16 bg-white dark:bg-black">
         <p className="text-xs font-medium uppercase tracking-widest text-zinc-400 dark:text-zinc-500">
           Placeholder
         </p>
