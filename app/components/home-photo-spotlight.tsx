@@ -2,6 +2,7 @@
 
 import { photoSpotlightItems } from "@/content/photos";
 import { softTransition, staggerDelay } from "@/lib/motion-presets";
+import Image from "next/image";
 import Link from "next/link";
 import { motion, useReducedMotion } from "motion/react";
 import { ArrowUpRight } from "lucide-react";
@@ -20,8 +21,8 @@ export function HomePhotoSpotlight() {
             Featured photos
           </h2>
           <p className="mt-1 max-w-2xl text-sm text-text-sub">
-            Stacked layout with a light hover—gradients for now; swap in real
-            shots anytime.
+            Personal frames from travel and everyday light—highlights below, with
+            the full set in the gallery.
           </p>
         </div>
         <Link
@@ -38,11 +39,8 @@ export function HomePhotoSpotlight() {
           {photoSpotlightItems.map((photo, i) => (
             <motion.div
               key={photo.id}
-              className="relative aspect-4/5 overflow-hidden rounded-2xl border border-border-base/80 shadow-[0_12px_40px_-16px_rgba(0,0,0,0.35)]"
-              style={{
-                backgroundImage: photo.gradient,
-                zIndex: photoSpotlightItems.length - i,
-              }}
+              className="relative aspect-4/5 overflow-hidden rounded-2xl border border-border-base/80 bg-muted shadow-[0_12px_40px_-16px_rgba(0,0,0,0.35)]"
+              style={{ zIndex: photoSpotlightItems.length - i }}
               initial={
                 reduced
                   ? { opacity: 0 }
@@ -74,7 +72,14 @@ export function HomePhotoSpotlight() {
                     }
               }
             >
-              <span className="absolute bottom-3 left-3 rounded-full bg-background/70 px-2.5 py-1 text-xs font-medium text-text-main backdrop-blur-sm dark:bg-surface-muted/80">
+              <Image
+                src={photo.src}
+                alt={photo.alt ?? photo.label}
+                fill
+                sizes="(max-width: 640px) 45vw, 22vw"
+                className="object-cover"
+              />
+              <span className="absolute bottom-3 left-3 z-10 rounded-full bg-background/70 px-2.5 py-1 text-xs font-medium text-text-main backdrop-blur-sm dark:bg-surface-muted/80">
                 {photo.label}
               </span>
             </motion.div>
