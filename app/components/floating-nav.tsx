@@ -71,7 +71,7 @@ export function FloatingNav({ serverDark }: { serverDark: boolean }) {
       className="pointer-events-none fixed top-4 left-1/2 z-50 flex -translate-x-1/2 justify-center px-4"
       aria-label="Main navigation"
     >
-      <div className="pointer-events-auto flex items-center gap-0.5 rounded-full border border-border-base/90 bg-background px-1.5 py-1 shadow-[0_8px_20px_-4px_rgba(0,0,0,0.08),0_4px_8px_-4px_rgba(0,0,0,0.06)] dark:border-border-base/80 dark:bg-surface-muted dark:shadow-[0_8px_20px_-4px_rgba(0,0,0,0.45),0_4px_8px_-4px_rgba(0,0,0,0.35)]">
+      <div className="pointer-events-auto flex items-center gap-0.5 rounded-full border border-border-base/35 bg-background/40 px-1.5 py-1 shadow-[0_8px_32px_-8px_rgba(0,0,0,0.1),0_4px_12px_-6px_rgba(0,0,0,0.06)] backdrop-blur-md backdrop-saturate-150 dark:border-white/8 dark:bg-background/25 dark:shadow-[0_8px_32px_-8px_rgba(0,0,0,0.45),0_4px_12px_-6px_rgba(0,0,0,0.32)]">
         <Link
           href="/"
           className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full transition-colors ${
@@ -87,14 +87,16 @@ export function FloatingNav({ serverDark }: { serverDark: boolean }) {
 
         <NavDivider />
 
-        <div className="flex items-center gap-1 px-0.5">
+        <div className="flex items-center gap-0.5 px-0 sm:gap-1 sm:px-0.5">
           {links.map(({ href, label, Icon }) => {
             const active = navLinkActive(pathname, href);
             return (
               <Link
                 key={href}
                 href={href}
-                className={`flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium transition-colors ${
+                title={label}
+                aria-label={label}
+                className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-xs font-medium transition-colors sm:h-auto sm:w-auto sm:gap-1.5 sm:px-2.5 sm:py-1 ${
                   active
                     ? "bg-ui-selected text-ui-selected-fg"
                     : "text-text-sub hover:bg-ui-hover active:bg-ui-active"
@@ -107,7 +109,7 @@ export function FloatingNav({ serverDark }: { serverDark: boolean }) {
                   size={iconSize}
                   strokeWidth={iconStroke}
                 />
-                <span>{label}</span>
+                <span className="hidden sm:inline">{label}</span>
               </Link>
             );
           })}
