@@ -93,14 +93,14 @@ html.dark {
 }
 
 
-/* body::before {
+body::before {
   content: "";
   position: fixed;
   inset: 0;
   z-index: 0;
   pointer-events: none;
-  background-image: radial-gradient(color-mix(in srgb, var(--foreground) 32%, transparent) 1px,
+  background-image: radial-gradient(color-mix(in srgb, var(--foreground) 16%, transparent) 1px,
       transparent 1px);
-  background-size: 16px 16px;
+  background-size: 12px 12px;
   background-position: 0 0;
-} */
+}
