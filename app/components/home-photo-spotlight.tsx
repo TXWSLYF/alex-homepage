@@ -1,14 +1,24 @@
 "use client";
 
+// TODO: After `/gallery` is fleshed out, load the full gallery set from a single source
+// and show 4 randomly chosen photos here on each visit (SSR shuffle or client-side pick).
+
+import type { PhotoSpotlightItem } from "@/content/photos";
 import { photoSpotlightItems } from "@/content/photos";
 import { softTransition, staggerDelay } from "@/lib/motion-presets";
 import Image from "next/image";
 import Link from "next/link";
-import { motion, useReducedMotion } from "motion/react";
+import { Reorder, useReducedMotion } from "motion/react";
 import { ArrowUpRight } from "lucide-react";
+import { useCallback, useState } from "react";
 
 export function HomePhotoSpotlight() {
   const reduced = useReducedMotion();
+  const [items, setItems] = useState(() => [...photoSpotlightItems]);
+
+  const onReorder = useCallback((next: PhotoSpotlightItem[]) => {
+    setItems(next);
+  }, []);
 
   return (
     <section className="relative mx-auto w-full max-w-5xl px-6 pb-24 pt-4 sm:px-10">
@@ -21,8 +31,8 @@ export function HomePhotoSpotlight() {
             Featured photos
           </h2>
           <p className="mt-1 max-w-2xl text-sm text-text-sub">
-            Personal frames from travel and everyday light—highlights below, with
-            the full set in the gallery.
+            Personal frames from travel and everyday light—highlights below,
+            with the full set in the gallery.
           </p>
         </div>
         <Link
@@ -35,12 +45,18 @@ export function HomePhotoSpotlight() {
       </div>
 
       <div className="relative min-h-[220px] sm:min-h-[260px]">
-        <div className="grid grid-cols-2 gap-3 sm:grid-cols-4 sm:gap-4">
-          {photoSpotlightItems.map((photo, i) => (
-            <motion.div
+        <Reorder.Group
+          axis="x"
+          values={items}
+          onReorder={onReorder}
+          className="isolate flex flex-wrap content-start justify-center gap-3 sm:gap-4"
+          aria-label="Featured photos"
+        >
+          {items.map((photo, i) => (
+            <Reorder.Item
               key={photo.id}
-              className="relative aspect-4/5 overflow-hidden rounded-2xl border border-border-base/80 bg-muted shadow-[0_12px_40px_-16px_rgba(0,0,0,0.35)]"
-              style={{ zIndex: photoSpotlightItems.length - i }}
+              value={photo}
+              className="relative aspect-4/5 w-[calc(50%-0.375rem)] max-w-[calc(50%-0.375rem)] flex-[0_0_auto] cursor-default overflow-hidden rounded-2xl border border-border-base/80 bg-muted shadow-[0_12px_40px_-16px_rgba(0,0,0,0.35)] sm:w-[calc(25%-0.75rem)] sm:max-w-[calc(25%-0.75rem)]"
               initial={
                 reduced
                   ? { opacity: 0 }
@@ -71,20 +87,22 @@ export function HomePhotoSpotlight() {
                       transition: { duration: 0.25 },
                     }
               }
+              whileDrag={{ scale: 1.05, rotate: 0 }}
             >
               <Image
                 src={photo.src}
                 alt={photo.alt ?? photo.label}
                 fill
+                draggable={false}
                 sizes="(max-width: 640px) 45vw, 22vw"
-                className="object-cover"
+                className="pointer-events-none object-cover select-none"
               />
               <span className="absolute bottom-3 left-3 z-10 rounded-full bg-background/70 px-2.5 py-1 text-xs font-medium text-text-main backdrop-blur-sm dark:bg-surface-muted/80">
                 {photo.label}
               </span>
-            </motion.div>
+            </Reorder.Item>
           ))}
-        </div>
+        </Reorder.Group>
       </div>
     </section>
   );
