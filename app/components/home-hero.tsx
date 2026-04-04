@@ -1,9 +1,15 @@
 "use client";
 
-import { homeContent } from "@/content/home";
+import { homeContent, skillBadges } from "@/content/home";
 import { softTransition, staggerDelay } from "@/lib/motion-presets";
+import Image from "next/image";
 import Link from "next/link";
 import { motion, useReducedMotion } from "motion/react";
+
+const SKILL_ROWS: [number, number][] = [
+  [0, 4],
+  [4, 8],
+];
 
 export function HomeHero() {
   const reduced = useReducedMotion();
@@ -68,8 +74,8 @@ export function HomeHero() {
           {homeContent.ctaSecondary.label}
         </Link>
       </motion.div>
-      <motion.ul
-        className="mt-10 flex flex-wrap justify-center gap-2"
+      <motion.div
+        className="mt-12 w-full max-w-2xl"
         initial={reduced ? { opacity: 0 } : { opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{
@@ -77,15 +83,25 @@ export function HomeHero() {
           ...softTransition(reduced),
         }}
       >
-        {homeContent.highlights.map((item) => (
-          <li
-            key={item}
-            className="rounded-full border border-border-base/80 bg-surface-muted/50 px-3 py-1 text-xs font-medium text-text-sub"
-          >
-            {item}
-          </li>
-        ))}
-      </motion.ul>
+        <div className="mx-auto flex w-full max-w-2xl flex-col items-center gap-2">
+          {SKILL_ROWS.map(([from, to]) => (
+            <ul key={from} className="flex flex-wrap justify-center gap-2">
+              {skillBadges.slice(from, to).map((badge) => (
+                <li key={badge.alt} className="leading-none">
+                  <Image
+                    src={badge.src}
+                    alt={badge.alt}
+                    width={160}
+                    height={24}
+                    unoptimized
+                    className="h-5 w-auto max-w-full rounded-[4px] sm:h-6"
+                  />
+                </li>
+              ))}
+            </ul>
+          ))}
+        </div>
+      </motion.div>
     </section>
   );
 }
