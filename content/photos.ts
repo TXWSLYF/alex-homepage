@@ -1,33 +1,33 @@
 export type PhotoSpotlightItem = {
   id: string;
-  /** 用 CSS 渐变占位，之后可换成 `src` + next/image */
+  /** CSS gradient placeholder; swap for `src` + next/image later */
   gradient: string;
   label: string;
 };
 
-/** 首页精选摄影；将 `gradient` 换为真实图片路径时再接入 next/image */
+/** Home gallery spotlight; wire next/image when using real assets */
 export const photoSpotlightItems: PhotoSpotlightItem[] = [
   {
     id: "1",
-    label: "城市夜景",
+    label: "City night",
     gradient:
       "linear-gradient(135deg, color-mix(in srgb, var(--primary) 55%, transparent) 0%, color-mix(in srgb, var(--foreground) 12%, transparent) 100%)",
   },
   {
     id: "2",
-    label: "海岸",
+    label: "Coast",
     gradient:
       "linear-gradient(160deg, color-mix(in srgb, var(--foreground) 18%, transparent) 0%, color-mix(in srgb, var(--primary) 40%, transparent) 100%)",
   },
   {
     id: "3",
-    label: "林间",
+    label: "Forest",
     gradient:
       "linear-gradient(200deg, color-mix(in srgb, var(--muted) 90%, transparent) 0%, color-mix(in srgb, var(--primary) 35%, transparent) 100%)",
   },
   {
     id: "4",
-    label: "建筑线条",
+    label: "Architecture",
     gradient:
       "linear-gradient(120deg, color-mix(in srgb, var(--foreground) 22%, transparent) 0%, color-mix(in srgb, var(--border) 80%, transparent) 100%)",
   },

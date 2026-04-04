@@ -17,17 +17,17 @@ export function HomeBlogTeaser() {
             Blog
           </p>
           <h2 className="mt-2 text-2xl font-semibold tracking-tight text-text-main">
-            最新文章
+            Latest posts
           </h2>
           <p className="mt-1 max-w-2xl text-sm text-text-sub">
-            两篇最近的更新；完整列表见 Blog。
+            Two recent updates—the full list lives on Blog.
           </p>
         </div>
         <Link
           href="/blog"
           className="mt-4 inline-flex items-center gap-1 text-sm font-medium text-brand hover:underline sm:mt-0"
         >
-          全部文章
+          All posts
           <ArrowUpRight className="h-4 w-4" aria-hidden />
         </Link>
       </div>
@@ -60,7 +60,7 @@ export function HomeBlogTeaser() {
                 {post.excerpt}
               </p>
               <span className="mt-4 inline-flex items-center gap-1 text-sm font-medium text-brand">
-                阅读
+                Read
                 <ArrowUpRight
                   className="h-4 w-4 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
                   aria-hidden

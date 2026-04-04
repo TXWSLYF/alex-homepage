@@ -1,4 +1,4 @@
-/** Shields.io flat-square badges（与常见 GitHub README 风格一致） */
+/** Shields.io flat-square badges (common GitHub README style) */
 export const skillBadges = [
   {
     alt: "Next.js",
@@ -39,7 +39,7 @@ export const homeContent = {
   role: "Full-stack Engineer",
   eyebrow: "Portfolio",
   tagline:
-    "全栈开发：从界面到接口、从数据到部署，把可靠、好用的产品端到端交付。",
-  ctaPrimary: { href: "/work", label: "看作品" },
-  ctaSecondary: { href: "/about", label: "关于我" },
+    "Full-stack development—from UI to APIs, data to deployment—shipping reliable, polished products end to end.",
+  ctaPrimary: { href: "/work", label: "View work" },
+  ctaSecondary: { href: "/about", label: "About me" },
 } as const;

@@ -4,6 +4,7 @@ import { photoSpotlightItems } from "@/content/photos";
 import { softTransition, staggerDelay } from "@/lib/motion-presets";
 import Link from "next/link";
 import { motion, useReducedMotion } from "motion/react";
+import { ArrowUpRight } from "lucide-react";
 
 export function HomePhotoSpotlight() {
   const reduced = useReducedMotion();
@@ -16,17 +17,19 @@ export function HomePhotoSpotlight() {
             Gallery
           </p>
           <h2 className="mt-2 text-2xl font-semibold tracking-tight text-text-main">
-            精选摄影
+            Featured photos
           </h2>
           <p className="mt-1 max-w-2xl text-sm text-text-sub">
-            错落叠放 + 轻 hover；图片为渐变占位，可替换为真实照片。
+            Stacked layout with a light hover—gradients for now; swap in real
+            shots anytime.
           </p>
         </div>
         <Link
           href="/gallery"
-          className="mt-4 text-sm font-medium text-brand hover:underline sm:mt-0"
+          className="mt-4 inline-flex items-center gap-1 text-sm font-medium text-brand hover:underline sm:mt-0"
         >
-          查看图集
+          View gallery
+          <ArrowUpRight className="h-4 w-4" aria-hidden />
         </Link>
       </div>
 

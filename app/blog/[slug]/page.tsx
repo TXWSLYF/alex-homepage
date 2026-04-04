@@ -15,7 +15,7 @@ export default async function BlogPostPage({ params }: Props) {
         href="/blog"
         className="text-sm font-medium text-brand hover:underline"
       >
-        ← 返回 Blog
+        ← Back to Blog
       </Link>
       <article className="mt-10">
         <time className="text-sm text-text-mute" dateTime={post.date}>
@@ -28,7 +28,7 @@ export default async function BlogPostPage({ params }: Props) {
           {post.excerpt}
         </p>
         <p className="mt-10 text-sm text-text-mute">
-          正文占位：后续可接 MDX 或 CMS。
+          Full post placeholder—wire up MDX or a CMS next.
         </p>
       </article>
     </main>

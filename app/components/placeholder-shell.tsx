@@ -1,6 +1,6 @@
 export function PlaceholderShell({
   title,
-  description = "占位页面，后续可替换为真实内容。",
+  description = "Placeholder page—replace with real content later.",
 }: {
   title: string;
   description?: string;

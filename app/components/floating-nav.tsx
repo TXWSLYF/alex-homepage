@@ -69,7 +69,7 @@ export function FloatingNav({ serverDark }: { serverDark: boolean }) {
   return (
     <nav
       className="pointer-events-none fixed top-4 left-1/2 z-50 flex -translate-x-1/2 justify-center px-4"
-      aria-label="主导航"
+      aria-label="Main navigation"
     >
       <div className="pointer-events-auto flex items-center gap-0.5 rounded-full border border-border-base/90 bg-background px-1.5 py-1 shadow-[0_8px_20px_-4px_rgba(0,0,0,0.08),0_4px_8px_-4px_rgba(0,0,0,0.06)] dark:border-border-base/80 dark:bg-surface-muted dark:shadow-[0_8px_20px_-4px_rgba(0,0,0,0.45),0_4px_8px_-4px_rgba(0,0,0,0.35)]">
         <Link
@@ -80,7 +80,7 @@ export function FloatingNav({ serverDark }: { serverDark: boolean }) {
               : "text-text-sub hover:bg-ui-hover active:bg-ui-active"
           }`}
           aria-current={homeActive ? "page" : undefined}
-          title="首页"
+          title="Home"
         >
           <Home aria-hidden size={iconSize} strokeWidth={iconStroke} />
         </Link>
@@ -119,8 +119,12 @@ export function FloatingNav({ serverDark }: { serverDark: boolean }) {
           type="button"
           onClick={toggleTheme}
           className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-text-sub transition-colors hover:bg-ui-hover active:bg-ui-active"
-          title={dark ? "切换为浅色" : "切换为深色"}
-          aria-label={dark ? "切换为浅色模式" : "切换为深色模式"}
+          title={dark ? "Switch to light mode" : "Switch to dark mode"}
+          aria-label={
+            dark
+              ? "Switch to light color scheme"
+              : "Switch to dark color scheme"
+          }
           suppressHydrationWarning
         >
           {dark ? (
