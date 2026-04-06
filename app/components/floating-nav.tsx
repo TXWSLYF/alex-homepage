@@ -25,11 +25,11 @@ function subscribeTheme(callback: () => void) {
   return () => mo.disconnect();
 }
 
-function useIsDarkHtml(serverDark: boolean) {
+function useIsDarkHtml() {
   return useSyncExternalStore(
     subscribeTheme,
     () => document.documentElement.classList.contains("dark"),
-    () => serverDark,
+    () => false,
   );
 }
 
@@ -54,9 +54,9 @@ function NavDivider() {
   );
 }
 
-export function FloatingNav({ serverDark }: { serverDark: boolean }) {
+export function FloatingNav() {
   const pathname = usePathname();
-  const dark = useIsDarkHtml(serverDark);
+  const dark = useIsDarkHtml();
   const homeActive = navLinkActive(pathname, "/");
 
   const toggleTheme = useCallback(() => {

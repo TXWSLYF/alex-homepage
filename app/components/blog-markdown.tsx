@@ -4,14 +4,14 @@ import rehypePrettyCode from "rehype-pretty-code";
 import remarkGfm from "remark-gfm";
 import { rehypePrettyCodeOptions } from "@/lib/rehype-pretty-code-options";
 
-function resolveMediaSrc(src: string): string {
+function resolveMediaSrc(src: string, slug: string): string {
   const trimmed = src.trim();
   if (trimmed.startsWith("http://") || trimmed.startsWith("https://")) {
     return trimmed;
   }
   if (trimmed.startsWith("/")) return trimmed;
   const name = trimmed.replace(/^\.\//, "");
-  return `/blog-media/${encodeURIComponent(name)}`;
+  return `/blog-media/${encodeURIComponent(slug)}/${encodeURIComponent(name)}`;
 }
 
 function isBlockCode(props: {
@@ -24,21 +24,22 @@ function isBlockCode(props: {
   );
 }
 
-const components: Components = {
-  img: ({ src, alt, ...props }) => {
+function createComponents(slug: string): Components {
+  return {
+    img: ({ src, alt, ...props }) => {
     if (!src || typeof src !== "string") return null;
     return (
       // eslint-disable-next-line @next/next/no-img-element -- blog body; dynamic URLs from markdown
       <img
-        src={resolveMediaSrc(src)}
+        src={resolveMediaSrc(src, slug)}
         alt={alt ?? ""}
         className="my-6 max-h-[min(70vh,720px)] w-auto max-w-full rounded-lg border border-border-base"
         loading="lazy"
         {...props}
       />
     );
-  },
-  a: ({ href, children, ...props }) => (
+    },
+    a: ({ href, children, ...props }) => (
     <a
       href={href}
       className="font-medium text-brand underline decoration-brand/30 underline-offset-2 hover:decoration-brand"
@@ -48,23 +49,23 @@ const components: Components = {
     >
       {children}
     </a>
-  ),
-  figure: ({ children, ...props }) => (
+    ),
+    figure: ({ children, ...props }) => (
     <figure
       className="my-6 max-w-full min-w-0 not-prose overflow-x-auto"
       {...props}
     >
       {children}
     </figure>
-  ),
-  table: ({ children, ...props }) => (
+    ),
+    table: ({ children, ...props }) => (
     <div className="my-6 max-w-full overflow-x-auto">
       <table className="w-max min-w-full border-collapse text-left text-sm" {...props}>
         {children}
       </table>
     </div>
-  ),
-  code: ({ className, children, ...props }) => {
+    ),
+    code: ({ className, children, ...props }) => {
     if (isBlockCode({ className, ...props })) {
       return (
         <code className={className} {...props}>
@@ -80,8 +81,8 @@ const components: Components = {
         {children}
       </code>
     );
-  },
-  pre: ({ children, className, ...props }) => (
+    },
+    pre: ({ children, className, ...props }) => (
     <pre
       {...props}
       className={[
@@ -94,26 +95,28 @@ const components: Components = {
     >
       {children}
     </pre>
-  ),
-};
+    ),
+  };
+}
 
 type Props = {
   content: string;
+  slug: string;
 };
 
 /**
  * 使用 MarkdownAsync：rehype-pretty-code（Shiki）为异步插件，默认 Markdown 走 runSync 会报错
  * “runSync finished async. Use run instead”。
  */
-export function BlogMarkdown({ content }: Props) {
+export function BlogMarkdown({ content, slug }: Props) {
   return (
     <div
       className={[
         "prose prose-neutral min-w-0 w-full max-w-none dark:prose-invert",
-        "break-words [overflow-wrap:anywhere]",
-        "prose-headings:scroll-mt-24 prose-headings:font-semibold prose-headings:tracking-tight prose-headings:break-words",
-        "prose-p:break-words prose-li:break-words",
-        "prose-a:text-brand prose-a:break-all sm:prose-a:break-words",
+        "wrap-anywhere",
+        "prose-headings:scroll-mt-24 prose-headings:font-semibold prose-headings:tracking-tight prose-headings:wrap-break-word",
+        "prose-p:wrap-break-word prose-li:wrap-break-word",
+        "prose-a:text-brand prose-a:break-all sm:prose-a:wrap-break-word",
         "prose-pre:bg-transparent prose-pre:p-0 prose-pre:shadow-none",
         /* 行内 code：不要用 prose-code 统一上色，否则会盖住 Shiki 在 pre>code 里对 span 的配色 */
         "prose-code:before:content-none prose-code:after:content-none",
@@ -123,7 +126,7 @@ export function BlogMarkdown({ content }: Props) {
       <MarkdownAsync
         remarkPlugins={[remarkGfm]}
         rehypePlugins={[[rehypePrettyCode, rehypePrettyCodeOptions]]}
-        components={components}
+        components={createComponents(slug)}
       >
         {content}
       </MarkdownAsync>

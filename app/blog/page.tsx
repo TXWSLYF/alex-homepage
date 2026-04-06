@@ -1,6 +1,9 @@
 import { getAllPosts } from "@/lib/blog";
 import Link from "next/link";
 
+export const dynamic = "force-static";
+export const revalidate = false;
+
 export const metadata = {
   title: "Blog — Alex",
   description: "Notes on UI, performance, and building things on the web.",

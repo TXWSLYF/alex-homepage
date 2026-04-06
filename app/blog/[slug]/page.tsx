@@ -6,6 +6,9 @@ import { notFound } from "next/navigation";
 
 type Props = { params: Promise<{ slug: string }> };
 
+export const dynamic = "force-static";
+export const revalidate = false;
+
 export async function generateStaticParams() {
   return getAllSlugs().map((slug) => ({ slug }));
 }
@@ -44,7 +47,7 @@ export default async function BlogPostPage({ params }: Props) {
         {post.author ? (
           <p className="mt-1 text-sm text-text-sub">{post.author}</p>
         ) : null}
-        <h1 className="mt-3 break-words text-3xl font-semibold tracking-tight text-text-main sm:text-4xl">
+        <h1 className="mt-3 wrap-break-word text-3xl font-semibold tracking-tight text-text-main sm:text-4xl">
           {post.title}
         </h1>
         {post.tags.length > 0 ? (
@@ -60,7 +63,7 @@ export default async function BlogPostPage({ params }: Props) {
           </ul>
         ) : null}
         <div className="mt-10">
-          <BlogMarkdown content={post.content} />
+          <BlogMarkdown content={post.content} slug={post.slug} />
         </div>
       </article>
     </main>
