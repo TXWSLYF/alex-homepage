@@ -11,7 +11,12 @@ export const dynamic = "force-static";
 export const revalidate = false;
 
 export async function generateStaticParams() {
-  return getAllSlugs().map((slug) => ({ slug }));
+  const slugs = getAllSlugs();
+  const expanded = slugs.flatMap((slug) => {
+    const encoded = encodeURIComponent(slug);
+    return encoded === slug ? [slug] : [slug, encoded];
+  });
+  return Array.from(new Set(expanded)).map((slug) => ({ slug }));
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {

@@ -38,14 +38,20 @@ function toCoverUrl(src: string, slug: string): string | undefined {
   const name = trimmed.replace(/^\.\/+/, "");
   // only support same-dir file reference (no subdirs)
   if (!name || name.includes("/") || name.includes("\\")) return undefined;
-  return `/blog-media/${encodeURIComponent(slug)}/${encodeURIComponent(name)}`;
+  // Keep slug unencoded so Next can resolve to the on-disk folder name in `public/`.
+  // The browser will percent-encode the URL on request; Next decodes before filesystem lookup.
+  return `/blog-media/${slug}/${encodeURIComponent(name)}`;
 }
 
 function slugifyFromFilename(fileName: string): string {
   const base = fileName.replace(/\.md$/i, "");
+  // Allow unicode letters/numbers so non-English filenames still get a stable slug.
+  // e.g. `数据库主键选择总结.md` -> `数据库主键选择总结`
+  // e.g. `postgresql 初始化.md` -> `postgresql-初始化`
   return base
+    .trim()
     .toLowerCase()
-    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/[^\p{Letter}\p{Number}]+/gu, "-")
     .replace(/^-+|-+$/g, "");
 }
 
@@ -53,9 +59,10 @@ function normalizeCustomSlug(raw: unknown): string | null {
   if (typeof raw !== "string") return null;
   const t = raw.trim();
   if (!t) return null;
+  // Match `slugifyFromFilename` behavior for consistency.
   return t
     .toLowerCase()
-    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/[^\p{Letter}\p{Number}]+/gu, "-")
     .replace(/^-+|-+$/g, "");
 }
 
@@ -98,7 +105,9 @@ function parseMarkdownFile(fileName: string): BlogPost | null {
 
   const slug = resolveSlug(fileName, data);
   const title =
-    typeof data.title === "string" ? data.title : slugifyFromFilename(fileName);
+    typeof data.title === "string"
+      ? data.title
+      : fileName.replace(/\.md$/i, "");
   const dateObj = parseDate(data);
   const date = formatDate(dateObj);
   const excerpt =
@@ -167,14 +176,23 @@ export function getAllPosts(): BlogListItem[] {
   }));
 }
 
-export function getPostBySlug(slug: string): BlogPost | null {
-  return allPublished().find((p) => p.slug === slug) ?? null;
-}
-
 export function getLatestPosts(n: number): BlogListItem[] {
   return getAllPosts().slice(0, n);
 }
 
 export function getAllSlugs(): string[] {
   return allPublished().map((p) => p.slug);
+}
+
+function safeDecodeSlug(slug: string): string {
+  try {
+    return decodeURIComponent(slug);
+  } catch {
+    return slug;
+  }
+}
+
+export function getPostBySlug(slug: string): BlogPost | null {
+  const normalized = safeDecodeSlug(slug);
+  return allPublished().find((p) => p.slug === normalized) ?? null;
 }

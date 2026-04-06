@@ -25,8 +25,9 @@ function isHidden(name) {
 function slugifyFromFilename(fileName) {
   const base = fileName.replace(/\.md$/i, "");
   return base
+    .trim()
     .toLowerCase()
-    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/[^\p{Letter}\p{Number}]+/gu, "-")
     .replace(/^-+|-+$/g, "");
 }
 
@@ -36,7 +37,7 @@ function normalizeCustomSlug(raw) {
   if (!t) return null;
   return t
     .toLowerCase()
-    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/[^\p{Letter}\p{Number}]+/gu, "-")
     .replace(/^-+|-+$/g, "");
 }
 
@@ -106,6 +107,7 @@ async function main() {
     const assets = extractLocalAssets(md);
     if (assets.length === 0) continue;
 
+    // Keep folder name unencoded to match Next's static file lookup (it decodes the URL path).
     const outDir = path.join(toDir, slug);
     await mkdir(outDir, { recursive: true });
 
