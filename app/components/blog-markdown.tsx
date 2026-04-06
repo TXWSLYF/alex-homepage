@@ -3,6 +3,7 @@ import { MarkdownAsync } from "react-markdown";
 import rehypePrettyCode from "rehype-pretty-code";
 import remarkGfm from "remark-gfm";
 import { rehypePrettyCodeOptions } from "@/lib/rehype-pretty-code-options";
+import { CodeBlockWithCopy } from "@/app/components/codeblock-with-copy";
 
 function resolveMediaSrc(src: string, slug: string): string {
   const trimmed = src.trim();
@@ -83,18 +84,9 @@ function createComponents(slug: string): Components {
     );
     },
     pre: ({ children, className, ...props }) => (
-    <pre
-      {...props}
-      className={[
-        "my-0 max-w-full min-w-0 overflow-x-auto rounded-xl border border-border-base bg-surface-muted p-0 text-sm leading-relaxed shadow-sm",
-        "[&_code]:block [&_code]:min-w-0 [&_code]:max-w-full [&_code]:bg-transparent [&_code]:p-4 [&_code]:font-mono [&_code]:leading-relaxed [&_code]:text-[0.9em]",
-        className ?? "",
-      ]
-        .filter(Boolean)
-        .join(" ")}
-    >
-      {children}
-    </pre>
+      <CodeBlockWithCopy className={className} {...props}>
+        {children}
+      </CodeBlockWithCopy>
     ),
   };
 }
