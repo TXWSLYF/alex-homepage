@@ -9,6 +9,7 @@ export type BlogListItem = {
   title: string;
   date: string;
   excerpt: string;
+  coverImage?: string;
 };
 
 export type BlogPost = BlogListItem & {
@@ -18,6 +19,27 @@ export type BlogPost = BlogListItem & {
   featured?: boolean;
   ogImage?: string;
 };
+
+function extractFirstImageSrc(markdown: string): string | null {
+  // Prefer markdown image syntax: ![alt](src)
+  const re = /!\[[^\]]*]\(([^)#?\s]+)(?:#[^)]*)?\)/m;
+  const m = markdown.match(re);
+  if (!m) return null;
+  const src = (m[1] ?? "").trim();
+  if (!src) return null;
+  return src;
+}
+
+function toCoverUrl(src: string, slug: string): string | undefined {
+  const trimmed = src.trim();
+  if (!trimmed) return undefined;
+  if (trimmed.startsWith("http://") || trimmed.startsWith("https://")) return trimmed;
+  if (trimmed.startsWith("/")) return trimmed;
+  const name = trimmed.replace(/^\.\/+/, "");
+  // only support same-dir file reference (no subdirs)
+  if (!name || name.includes("/") || name.includes("\\")) return undefined;
+  return `/blog-media/${encodeURIComponent(slug)}/${encodeURIComponent(name)}`;
+}
 
 function slugifyFromFilename(fileName: string): string {
   const base = fileName.replace(/\.md$/i, "");
@@ -84,6 +106,9 @@ function parseMarkdownFile(fileName: string): BlogPost | null {
     (typeof data.excerpt === "string" && data.excerpt) ||
     "";
 
+  const firstImageSrc = extractFirstImageSrc(content);
+  const coverImage = firstImageSrc ? toCoverUrl(firstImageSrc, slug) : undefined;
+
   const author =
     typeof data.author === "string" ? data.author : undefined;
   const featured =
@@ -98,6 +123,7 @@ function parseMarkdownFile(fileName: string): BlogPost | null {
     title,
     date,
     excerpt,
+    coverImage,
     content,
     tags: parseTags(data),
     author,
@@ -137,6 +163,7 @@ export function getAllPosts(): BlogListItem[] {
     title: p.title,
     date: p.date,
     excerpt: p.excerpt,
+    coverImage: p.coverImage,
   }));
 }
 

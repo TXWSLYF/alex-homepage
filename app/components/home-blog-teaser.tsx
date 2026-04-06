@@ -2,6 +2,7 @@
 
 import type { BlogListItem } from "@/lib/blog";
 import { softTransition, staggerDelay } from "@/lib/motion-presets";
+import Image from "next/image";
 import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
 import { motion, useReducedMotion } from "motion/react";
@@ -60,8 +61,21 @@ export function HomeBlogTeaser({ posts }: Props) {
             >
               <Link
                 href={`/blog/${post.slug}`}
-                className="group flex h-full flex-col rounded-2xl border border-border-base bg-background p-5 transition-colors hover:bg-ui-hover active:bg-ui-active"
+                className="group flex h-full flex-col overflow-hidden rounded-2xl border border-border-base bg-background transition-colors hover:bg-ui-hover active:bg-ui-active"
               >
+                {post.coverImage ? (
+                  <div className="relative aspect-video w-full border-b border-border-base bg-surface-muted">
+                    <Image
+                      src={post.coverImage}
+                      alt=""
+                      fill
+                      sizes="(max-width: 768px) 100vw, 50vw"
+                      className="object-cover"
+                      priority={i === 0}
+                    />
+                  </div>
+                ) : null}
+                <div className="flex h-full flex-col p-5">
                 <time
                   dateTime={post.date}
                   className="text-xs font-medium text-text-mute"
@@ -81,6 +95,7 @@ export function HomeBlogTeaser({ posts }: Props) {
                     aria-hidden
                   />
                 </span>
+                </div>
               </Link>
             </motion.article>
           ))}

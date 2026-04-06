@@ -1,6 +1,7 @@
 import { BlogMarkdown } from "@/app/components/blog-markdown";
 import { getAllSlugs, getPostBySlug } from "@/lib/blog";
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
@@ -50,6 +51,18 @@ export default async function BlogPostPage({ params }: Props) {
         <h1 className="mt-3 wrap-break-word text-3xl font-semibold tracking-tight text-text-main sm:text-4xl">
           {post.title}
         </h1>
+        {post.coverImage ? (
+          <div className="relative mt-8 aspect-21/9 w-full overflow-hidden rounded-2xl border border-border-base bg-surface-muted">
+            <Image
+              src={post.coverImage}
+              alt=""
+              fill
+              sizes="(max-width: 768px) 100vw, 768px"
+              className="object-cover"
+              priority
+            />
+          </div>
+        ) : null}
         {post.tags.length > 0 ? (
           <ul className="mt-4 flex flex-wrap gap-2">
             {post.tags.map((tag) => (

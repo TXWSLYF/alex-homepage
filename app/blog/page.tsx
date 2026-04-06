@@ -1,4 +1,5 @@
 import { getAllPosts } from "@/lib/blog";
+import Image from "next/image";
 import Link from "next/link";
 
 export const dynamic = "force-static";
@@ -25,22 +26,35 @@ export default function BlogPage() {
           <li key={post.slug}>
             <Link
               href={`/blog/${post.slug}`}
-              className="group block rounded-2xl border border-border-base bg-background p-5 transition-colors hover:bg-ui-hover active:bg-ui-active"
+              className="group block overflow-hidden rounded-2xl border border-border-base bg-background transition-colors hover:bg-ui-hover active:bg-ui-active"
             >
-              <time
-                dateTime={post.date}
-                className="text-xs font-medium text-text-mute"
-              >
-                {post.date}
-              </time>
-              <h2 className="mt-2 text-lg font-semibold text-text-main group-hover:text-brand">
-                {post.title}
-              </h2>
-              {post.excerpt ? (
-                <p className="mt-2 text-sm leading-relaxed text-text-sub">
-                  {post.excerpt}
-                </p>
+              {post.coverImage ? (
+                <div className="relative aspect-21/9 w-full border-b border-border-base bg-surface-muted">
+                  <Image
+                    src={post.coverImage}
+                    alt=""
+                    fill
+                    sizes="(max-width: 768px) 100vw, 768px"
+                    className="object-cover"
+                  />
+                </div>
               ) : null}
+              <div className="p-5">
+                <time
+                  dateTime={post.date}
+                  className="text-xs font-medium text-text-mute"
+                >
+                  {post.date}
+                </time>
+                <h2 className="mt-2 text-lg font-semibold text-text-main group-hover:text-brand">
+                  {post.title}
+                </h2>
+                {post.excerpt ? (
+                  <p className="mt-2 text-sm leading-relaxed text-text-sub">
+                    {post.excerpt}
+                  </p>
+                ) : null}
+              </div>
             </Link>
           </li>
         ))}
