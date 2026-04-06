@@ -94,7 +94,7 @@ html.dark {
 }
 
 
-body::before {
+/* body::before {
   content: "";
   position: fixed;
   inset: 0;
@@ -104,7 +104,7 @@ body::before {
       transparent 1px);
   background-size: 12px 12px;
   background-position: 0 0;
-}
+} */
 
 /* rehype-pretty-code + Shiki：双主题（与 html.dark 同步） */
 code[data-theme*=" "] span {
