@@ -1,12 +1,16 @@
 "use client";
 
-import { blogPreviewItems } from "@/content/blog-preview";
+import type { BlogListItem } from "@/lib/blog";
 import { softTransition, staggerDelay } from "@/lib/motion-presets";
 import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
 import { motion, useReducedMotion } from "motion/react";
 
-export function HomeBlogTeaser() {
+type Props = {
+  posts: BlogListItem[];
+};
+
+export function HomeBlogTeaser({ posts }: Props) {
   const reduced = useReducedMotion();
 
   return (
@@ -20,7 +24,9 @@ export function HomeBlogTeaser() {
             Latest posts
           </h2>
           <p className="mt-1 max-w-2xl text-sm text-text-sub">
-            Two recent updates—the full list lives on Blog.
+            {posts.length > 0
+              ? "Recent updates—the full list lives on Blog."
+              : "Posts will appear here once published."}
           </p>
         </div>
         <Link
@@ -31,45 +37,55 @@ export function HomeBlogTeaser() {
           <ArrowUpRight className="h-4 w-4" aria-hidden />
         </Link>
       </div>
-      <div className="grid gap-4 md:grid-cols-2">
-        {blogPreviewItems.map((post, i) => (
-          <motion.article
-            key={post.slug}
-            initial={reduced ? { opacity: 0 } : { opacity: 0, y: 10 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-40px" }}
-            transition={{
-              delay: staggerDelay(reduced, i),
-              ...softTransition(reduced),
-            }}
-          >
-            <Link
-              href={`/blog/${post.slug}`}
-              className="group flex h-full flex-col rounded-2xl border border-border-base bg-background p-5 transition-colors hover:bg-ui-hover active:bg-ui-active"
+      {posts.length === 0 ? (
+        <p className="text-sm text-text-sub">
+          Nothing here yet—check back soon or visit{" "}
+          <Link href="/blog" className="font-medium text-brand hover:underline">
+            Blog
+          </Link>
+          .
+        </p>
+      ) : (
+        <div className="grid gap-4 md:grid-cols-2">
+          {posts.map((post, i) => (
+            <motion.article
+              key={post.slug}
+              initial={reduced ? { opacity: 0 } : { opacity: 0, y: 10 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "-40px" }}
+              transition={{
+                delay: staggerDelay(reduced, i),
+                ...softTransition(reduced),
+              }}
             >
-              <time
-                dateTime={post.date}
-                className="text-xs font-medium text-text-mute"
+              <Link
+                href={`/blog/${post.slug}`}
+                className="group flex h-full flex-col rounded-2xl border border-border-base bg-background p-5 transition-colors hover:bg-ui-hover active:bg-ui-active"
               >
-                {post.date}
-              </time>
-              <h3 className="mt-3 text-lg font-semibold text-text-main group-hover:text-brand">
-                {post.title}
-              </h3>
-              <p className="mt-2 flex-1 text-sm leading-relaxed text-text-sub">
-                {post.excerpt}
-              </p>
-              <span className="mt-4 inline-flex items-center gap-1 text-sm font-medium text-brand">
-                Read
-                <ArrowUpRight
-                  className="h-4 w-4 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
-                  aria-hidden
-                />
-              </span>
-            </Link>
-          </motion.article>
-        ))}
-      </div>
+                <time
+                  dateTime={post.date}
+                  className="text-xs font-medium text-text-mute"
+                >
+                  {post.date}
+                </time>
+                <h3 className="mt-3 text-lg font-semibold text-text-main group-hover:text-brand">
+                  {post.title}
+                </h3>
+                <p className="mt-2 flex-1 text-sm leading-relaxed text-text-sub">
+                  {post.excerpt}
+                </p>
+                <span className="mt-4 inline-flex items-center gap-1 text-sm font-medium text-brand">
+                  Read
+                  <ArrowUpRight
+                    className="h-4 w-4 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
+                    aria-hidden
+                  />
+                </span>
+              </Link>
+            </motion.article>
+          ))}
+        </div>
+      )}
     </section>
   );
 }

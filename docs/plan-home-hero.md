@@ -96,7 +96,7 @@ isProject: true
 ## 与当前代码的衔接（实现时）
 
 - 首页结构建议为**纵向多段**：`Hero` → `LatestBlog`（2 卡）→ `PhotoSpotlight` → 可选页脚链接；在 [app/page.tsx](../app/page.tsx) 组合，而不是继续单独使用通用 [app/components/placeholder-shell.tsx](../app/components/placeholder-shell.tsx) 作为整页。
-- **博客数据**：可先 `content/blog-preview.ts` 或 `lib/blog.ts` 静态数组（标题、slug、日期、摘要、封面路径）；后续再接 MDX/文件系统遍历，避免首页与内容源强耦合。
+- **博客数据**：由 `lib/blog.ts` 读取 `content/blog/*.md`（标题、slug、日期、摘要等）；首页 teaser 由服务端传入最新条目。
 - **摄影资源**：`public/photos/...` + `next/image`；精选列表同样可先静态配置数组。
 - 文案与链接建议集中在一处（如 `content/home.ts`），便于以后改文案而不改 JSX 结构。
 - 保持与顶栏 [app/components/floating-nav.tsx](../app/components/floating-nav.tsx) 的间距（Hero 顶部 `pt-24` 量级可延续；下方区块用 `py-16`～`py-24` 分段）。
@@ -121,7 +121,7 @@ isProject: true
 | 计划项 | 位置 |
 |--------|------|
 | Hero | `app/components/home-hero.tsx`，文案 `content/home.ts` |
-| 博客两卡 | `app/components/home-blog-teaser.tsx`，数据 `content/blog-preview.ts` |
+| 博客两卡 | `app/components/home-blog-teaser.tsx`，数据来自 `getLatestPosts()` |
 | 文章占位页 | `app/blog/[slug]/page.tsx` |
 | 摄影区 | `app/components/home-photo-spotlight.tsx`，数据 `content/photos.ts` |
 | 动效预设 | `lib/motion-presets.ts`，组件内 `useReducedMotion`（`motion/react`） |
