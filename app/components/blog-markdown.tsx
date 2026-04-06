@@ -50,9 +50,19 @@ const components: Components = {
     </a>
   ),
   figure: ({ children, ...props }) => (
-    <figure className="my-6 not-prose" {...props}>
+    <figure
+      className="my-6 max-w-full min-w-0 not-prose overflow-x-auto"
+      {...props}
+    >
       {children}
     </figure>
+  ),
+  table: ({ children, ...props }) => (
+    <div className="my-6 max-w-full overflow-x-auto">
+      <table className="w-max min-w-full border-collapse text-left text-sm" {...props}>
+        {children}
+      </table>
+    </div>
   ),
   code: ({ className, children, ...props }) => {
     if (isBlockCode({ className, ...props })) {
@@ -75,8 +85,8 @@ const components: Components = {
     <pre
       {...props}
       className={[
-        "my-0 overflow-x-auto rounded-xl border border-border-base bg-surface-muted p-0 text-sm leading-relaxed shadow-sm",
-        "[&_code]:block [&_code]:min-w-0 [&_code]:bg-transparent [&_code]:p-4 [&_code]:font-mono [&_code]:leading-relaxed [&_code]:text-[0.9em]",
+        "my-0 max-w-full min-w-0 overflow-x-auto rounded-xl border border-border-base bg-surface-muted p-0 text-sm leading-relaxed shadow-sm",
+        "[&_code]:block [&_code]:min-w-0 [&_code]:max-w-full [&_code]:bg-transparent [&_code]:p-4 [&_code]:font-mono [&_code]:leading-relaxed [&_code]:text-[0.9em]",
         className ?? "",
       ]
         .filter(Boolean)
@@ -99,9 +109,11 @@ export function BlogMarkdown({ content }: Props) {
   return (
     <div
       className={[
-        "prose prose-neutral max-w-none dark:prose-invert",
-        "prose-headings:scroll-mt-24 prose-headings:font-semibold prose-headings:tracking-tight",
-        "prose-a:text-brand",
+        "prose prose-neutral min-w-0 w-full max-w-none dark:prose-invert",
+        "break-words [overflow-wrap:anywhere]",
+        "prose-headings:scroll-mt-24 prose-headings:font-semibold prose-headings:tracking-tight prose-headings:break-words",
+        "prose-p:break-words prose-li:break-words",
+        "prose-a:text-brand prose-a:break-all sm:prose-a:break-words",
         "prose-pre:bg-transparent prose-pre:p-0 prose-pre:shadow-none",
         /* 行内 code：不要用 prose-code 统一上色，否则会盖住 Shiki 在 pre>code 里对 span 的配色 */
         "prose-code:before:content-none prose-code:after:content-none",

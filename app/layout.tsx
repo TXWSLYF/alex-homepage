@@ -36,7 +36,7 @@ export default async function RootLayout({
       suppressHydrationWarning
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased${serverDark ? " dark" : ""}`}
     >
-      <body className="relative min-h-full flex flex-col font-sans">
+      <body className="relative min-h-full flex flex-col overflow-x-clip font-sans">
         <FloatingNav serverDark={serverDark} />
         {children}
       </body>

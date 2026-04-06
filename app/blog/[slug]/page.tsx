@@ -30,21 +30,21 @@ export default async function BlogPostPage({ params }: Props) {
   if (!post) notFound();
 
   return (
-    <main className="mx-auto max-w-3xl flex-1 px-6 py-24 sm:px-10">
+    <main className="mx-auto w-full min-w-0 max-w-3xl flex-1 overflow-x-clip px-6 py-24 sm:px-10">
       <Link
         href="/blog"
         className="text-sm font-medium text-brand hover:underline"
       >
         ← Back to Blog
       </Link>
-      <article className="mt-10">
+      <article className="mt-10 min-w-0 max-w-full">
         <time className="text-sm text-text-mute" dateTime={post.date}>
           {post.date}
         </time>
         {post.author ? (
           <p className="mt-1 text-sm text-text-sub">{post.author}</p>
         ) : null}
-        <h1 className="mt-3 text-3xl font-semibold tracking-tight text-text-main sm:text-4xl">
+        <h1 className="mt-3 break-words text-3xl font-semibold tracking-tight text-text-main sm:text-4xl">
           {post.title}
         </h1>
         {post.tags.length > 0 ? (
