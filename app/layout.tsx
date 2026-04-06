@@ -1,8 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
-import Script from "next/script";
 import { FloatingNav } from "./components/floating-nav";
-import { THEME_COOKIE } from "@/lib/theme";
+import { THEME_STORAGE_KEY } from "@/lib/theme";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -22,16 +21,22 @@ export const metadata: Metadata = {
 };
 
 function InitialThemeScript() {
-  // 在构建时静态输出页面时，不能在服务端读取 cookies()，否则整站会变成动态渲染。
-  // 这里用 beforeInteractive 的内联脚本在首屏渲染前读取 cookie，并切换 html.dark，避免闪烁。
-  const cookieName = THEME_COOKIE;
-  // Avoid template-literal interpolation pitfalls inside regexes for Turbopack parser.
-  const code =
-    "(function(){try{var name=" +
-    JSON.stringify(cookieName) +
-    ";var v=('; '+document.cookie).split('; '+name+'=').pop().split(';')[0];v=decodeURIComponent(v||'');if(v==='dark'){document.documentElement.classList.add('dark')}else if(v==='light'){document.documentElement.classList.remove('dark')}}catch(e){}})();";
+  // Static export can't read server cookies; use localStorage instead.
+  // This blocking head script sets `html.dark` before the first paint.
+  const storageKey = JSON.stringify(THEME_STORAGE_KEY);
+  const code = `(function () {
+  try {
+    var key = ${storageKey};
+    var value = localStorage.getItem(key) || "";
+    var root = document.documentElement;
+    var dark = value === "dark";
 
-  return <Script id="initial-theme" strategy="beforeInteractive" dangerouslySetInnerHTML={{ __html: code }} />;
+    root.classList.toggle("dark", dark);
+  } catch (e) {}
+})();`;
+
+  // NOTE: During static export, Next may emit CSS links before head children.
+  return <script dangerouslySetInnerHTML={{ __html: code }} />;
 }
 
 export default function RootLayout({
@@ -45,8 +50,10 @@ export default function RootLayout({
       suppressHydrationWarning
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
-      <body className="relative min-h-full flex flex-col overflow-x-clip font-sans">
+      <head>
         <InitialThemeScript />
+      </head>
+      <body className="relative min-h-full flex flex-col overflow-x-clip font-sans">
         <FloatingNav />
         {children}
       </body>

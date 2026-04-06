@@ -129,11 +129,19 @@ export function FloatingNav() {
           }
           suppressHydrationWarning
         >
-          {dark ? (
-            <Sun aria-hidden size={iconSize} strokeWidth={iconStroke} />
-          ) : (
-            <Moon aria-hidden size={iconSize} strokeWidth={iconStroke} />
-          )}
+          {/* Avoid icon flash by letting CSS (html.dark) decide visibility. */}
+          <Sun
+            aria-hidden
+            size={iconSize}
+            strokeWidth={iconStroke}
+            className="hidden dark:block"
+          />
+          <Moon
+            aria-hidden
+            size={iconSize}
+            strokeWidth={iconStroke}
+            className="block dark:hidden"
+          />
         </button>
       </div>
     </nav>

@@ -1,10 +1,14 @@
-/** Cookie name; keep in sync with `layout` `cookies()` and `setClientTheme` */
-export const THEME_COOKIE = "theme";
+/** localStorage key used by `layout` initial theme script. */
+export const THEME_STORAGE_KEY = "theme";
 
-const COOKIE_MAX_AGE = 60 * 60 * 24 * 365;
+export type ThemeMode = "dark" | "light";
 
-/** Persist theme to cookie; server reads it to set `dark` on `<html>` */
-export function setClientTheme(mode: "dark" | "light") {
-  if (typeof document === "undefined") return;
-  document.cookie = `${THEME_COOKIE}=${encodeURIComponent(mode)};path=/;max-age=${COOKIE_MAX_AGE};SameSite=Lax`;
+/** Persist theme to localStorage (static export friendly). */
+export function setClientTheme(mode: ThemeMode) {
+  if (typeof window === "undefined") return;
+  try {
+    window.localStorage.setItem(THEME_STORAGE_KEY, mode);
+  } catch {
+    // ignore (private mode / quota / blocked storage)
+  }
 }
