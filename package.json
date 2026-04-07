@@ -7,6 +7,7 @@
     "prebuild": "node scripts/copy-blog-media.mjs && node scripts/gallery.mjs build-json",
     "gallery:pull": "node scripts/gallery.mjs pull",
     "gallery:push": "node scripts/gallery.mjs push",
+    "gallery:thumbs": "node scripts/gallery.mjs generate-thumbs",
     "gallery:build": "node scripts/gallery.mjs build-json",
     "build": "next build",
     "start": "next start",
@@ -23,7 +24,8 @@
     "react-markdown": "^10.1.0",
     "rehype-pretty-code": "^0.14.3",
     "remark-gfm": "^4.0.1",
-    "shiki": "^4.0.2"
+    "shiki": "^4.0.2",
+    "thumbhash": "^0.1.1"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
@@ -33,7 +35,7 @@
     "@types/react-dom": "^19",
     "eslint": "^9",
     "eslint-config-next": "16.2.2",
-    "image-size": "^2.0.2",
+    "sharp": "^0.34.5",
     "tailwindcss": "^4",
     "typescript": "^5"
   }

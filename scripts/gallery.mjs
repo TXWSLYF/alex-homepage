@@ -6,7 +6,8 @@
  *   本地: ${GALLERY_PHOTOS_DIR}/originals/ 、 thumbs/1600w/
  *
  * 用法：
- *   node scripts/gallery.mjs pull|push|build-json
+ *   node scripts/gallery.mjs pull|push|generate-thumbs|build-json
+ *   generate-thumbs 可加 --force 忽略「缩略图已比原图新」的跳过逻辑
  *
  * 环境变量见 .env.gallery.example；可放在 .env.gallery（需自行创建，已 gitignore）。
  */
@@ -27,8 +28,8 @@ import {
 import path from "node:path";
 import { pipeline } from "node:stream/promises";
 import { fileURLToPath } from "node:url";
-import { imageSize } from "image-size";
-import { open } from "node:fs/promises";
+import sharp from "sharp";
+import { rgbaToThumbHash } from "thumbhash";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const root = path.join(__dirname, "..");
@@ -199,6 +200,79 @@ async function push() {
   console.log("push 完成");
 }
 
+/** 可作为原图生成缩略图的扩展名（小写比较） */
+const ORIGINAL_EXT_RE = /\.(jpe?g|png|webp|tiff?|gif|avif)$/i;
+
+/**
+ * 从 originals 生成 thumbs/1600w/*.webp。
+ * sharp().rotate() 无参时会按 EXIF Orientation 摆正像素，再缩放，避免「去掉 EXIF 后缩略图方向错误」。
+ */
+async function generateThumbs() {
+  await loadEnvGallery();
+  const maxW = Number.parseInt(
+    process.env.GALLERY_THUMB_MAX_WIDTH || "1600",
+    10,
+  );
+  const origDir = localOriginalsDir();
+  const outDir = localThumbsDir();
+  await mkdir(outDir, { recursive: true });
+
+  let names;
+  try {
+    names = await readdir(origDir);
+  } catch (e) {
+    console.error("无法读取原图目录:", origDir, e.message || e);
+    process.exit(1);
+  }
+
+  const force = process.argv.includes("--force");
+  const inputs = names
+    .filter((n) => !n.startsWith(".") && ORIGINAL_EXT_RE.test(n))
+    .sort((a, b) =>
+      a.localeCompare(b, undefined, { numeric: true, sensitivity: "base" }),
+    );
+
+  if (inputs.length === 0) {
+    console.warn("未找到可处理的原图:", origDir);
+    return;
+  }
+
+  for (const name of inputs) {
+    const inPath = path.join(origDir, name);
+    const s = stem(name);
+    const outPath = path.join(outDir, `${s}.webp`);
+
+    if (!force) {
+      try {
+        const [stIn, stOut] = await Promise.all([stat(inPath), stat(outPath)]);
+        if (stOut.mtimeMs >= stIn.mtimeMs) {
+          console.log("跳过（缩略图已最新）", path.relative(root, outPath));
+          continue;
+        }
+      } catch {
+        // 输出不存在则继续生成
+      }
+    }
+
+    await sharp(inPath)
+      .rotate()
+      .resize({
+        width: maxW,
+        withoutEnlargement: true,
+      })
+      .webp({ quality: 82, effort: 4 })
+      .toFile(outPath);
+
+    console.log(
+      "缩略图",
+      path.relative(root, inPath),
+      "->",
+      path.relative(root, outPath),
+    );
+  }
+  console.log("generate-thumbs 完成（请按需 npm run gallery:push 上传 R2）");
+}
+
 function stem(name) {
   const i = name.lastIndexOf(".");
   return i === -1 ? name : name.slice(0, i);
@@ -224,17 +298,8 @@ function findOriginalName(stemName, originalFiles) {
   return null;
 }
 
-/** 从缓冲区探测宽高（JPEG/WebP/PNG 等） */
-function dimensionsFromBuffer(buf) {
-  const r = imageSize(buf);
-  if (!r.width || !r.height) {
-    throw new Error("无法从文件头解析宽高");
-  }
-  return { width: r.width, height: r.height };
-}
-
 /**
- * 拉取对象前若干字节探测尺寸；失败则整对象拉取（大图较少触发）。
+ * 拉取对象前若干字节；失败则整对象拉取。
  */
 async function fetchObjectBytes(client, key, maxBytes) {
   const out = await client.send(
@@ -251,84 +316,70 @@ async function fetchObjectBytes(client, key, maxBytes) {
   return Buffer.concat(chunks);
 }
 
-async function probeDimensionsFromS3Key(client, key) {
-  const partialSizes = [512 * 1024, 1024 * 1024];
-  for (const n of partialSizes) {
-    try {
-      const buf = await fetchObjectBytes(client, key, n);
-      return dimensionsFromBuffer(buf);
-    } catch {
-      // 继续尝试更大片段或整文件
+/**
+ * 从缩略图二进制生成尺寸 + ThumbHash（base64）；尺寸与 WebP 像素一致，Hash 供前端解码为 data URL 占位。
+ * ThumbHash 要求编码图宽高均 ≤100，故先 fit 进 100×100。
+ */
+async function thumbMetaFromBuffer(buf) {
+  const meta = await sharp(buf).metadata();
+  const tw = meta.width;
+  const th = meta.height;
+  if (!tw || !th) throw new Error("无法读取缩略图尺寸");
+
+  let thumbHashBase64;
+  try {
+    const { data, info } = await sharp(buf)
+      .ensureAlpha()
+      .resize(100, 100, { fit: "inside" })
+      .raw()
+      .toBuffer({ resolveWithObject: true });
+    if (info.width > 100 || info.height > 100) {
+      throw new Error(`thumbhash 尺寸过大 ${info.width}x${info.height}`);
     }
+    const hash = rgbaToThumbHash(info.width, info.height, data);
+    thumbHashBase64 = Buffer.from(hash).toString("base64");
+  } catch (e) {
+    console.warn(
+      `[gallery] ThumbHash 跳过 ${e?.message || e}`,
+    );
   }
-  const full = await fetchObjectBytes(client, key, null);
-  return dimensionsFromBuffer(full);
+
+  return {
+    thumbWidth: tw,
+    thumbHeight: th,
+    ...(thumbHashBase64 ? { thumbHashBase64 } : {}),
+  };
 }
 
 /**
- * 优先原图对象；若无或未配对则读缩略图对象。
+ * 瀑布流占位必须与 **缩略图文件** 的像素比例一致（已按 EXIF 转正后的 WebP）。
  */
-async function attachDimensionsR2(client, item, origRel) {
-  const keysTry = [];
-  if (origRel) {
-    keysTry.push(
-      `${R2_PREFIX_ORIGINALS}/${origRel.split(path.sep).join("/")}`,
-    );
-  }
-  keysTry.push(`${R2_PREFIX_THUMBS}/${item.thumbName}`);
-  let lastErr;
-  for (const key of keysTry) {
-    try {
-      const { width, height } = await probeDimensionsFromS3Key(client, key);
-      return { originalWidth: width, originalHeight: height };
-    } catch (e) {
-      lastErr = e;
-    }
-  }
-  console.warn(
-    `[gallery] 无法探测尺寸 ${item.thumbName}，使用占位 3:2`,
-    lastErr?.message || lastErr,
-  );
-  return { originalWidth: 3, originalHeight: 2 };
-}
-
-async function probeLocalImagePath(p) {
-  const headMax = 768 * 1024;
-  const fh = await open(p, "r");
+async function attachThumbMetaR2(client, item) {
+  const thumbKey = `${R2_PREFIX_THUMBS}/${item.thumbName}`;
   try {
-    const buf = Buffer.allocUnsafe(headMax);
-    const { bytesRead } = await fh.read(buf, 0, headMax, 0);
-    try {
-      return dimensionsFromBuffer(buf.subarray(0, bytesRead));
-    } catch {
-      const full = await readFile(p);
-      return dimensionsFromBuffer(full);
-    }
-  } finally {
-    await fh.close();
+    const buf = await fetchObjectBytes(client, thumbKey, null);
+    return await thumbMetaFromBuffer(buf);
+  } catch (e) {
+    console.warn(
+      `[gallery] 无法处理缩略图 ${item.thumbName}，使用占位 3:2`,
+      e?.message || e,
+    );
+    return { thumbWidth: 3, thumbHeight: 2 };
   }
 }
 
-async function attachDimensionsLocal(item, origName) {
+async function attachThumbMetaLocal(item) {
   const thumbPath = path.join(localThumbsDir(), item.thumbName);
-  const origPath = origName
-    ? path.join(localOriginalsDir(), origName)
-    : null;
-  const tryPaths = [origPath, thumbPath].filter(Boolean);
-  let lastErr;
-  for (const p of tryPaths) {
-    try {
-      const { width, height } = await probeLocalImagePath(p);
-      return { originalWidth: width, originalHeight: height };
-    } catch (e) {
-      lastErr = e;
-    }
+  try {
+    const buf = await readFile(thumbPath);
+    return await thumbMetaFromBuffer(buf);
+  } catch (e) {
+    console.warn(
+      `[gallery] 本地无法处理缩略图 ${item.thumbName}，使用占位 3:2`,
+      e?.message || e,
+    );
+    return { thumbWidth: 3, thumbHeight: 2 };
   }
-  console.warn(
-    `[gallery] 本地无法探测尺寸 ${item.thumbName}，使用占位 3:2`,
-    lastErr?.message || lastErr,
-  );
-  return { originalWidth: 3, originalHeight: 2 };
 }
 
 async function buildFromR2(client, publicBase) {
@@ -367,10 +418,16 @@ async function buildFromR2(client, publicBase) {
     }),
   );
   for (const item of items) {
-    const origRel = origByStem.get(item.id.toLowerCase());
-    const dims = await attachDimensionsR2(client, item, origRel);
-    Object.assign(item, dims);
-    console.log("尺寸", item.thumbName, dims.originalWidth, "×", dims.originalHeight);
+    const meta = await attachThumbMetaR2(client, item);
+    Object.assign(item, meta);
+    console.log(
+      "缩略图",
+      item.thumbName,
+      meta.thumbWidth,
+      "×",
+      meta.thumbHeight,
+      meta.thumbHashBase64 ? `+ ThumbHash (${meta.thumbHashBase64.length}B b64)` : "",
+    );
   }
   return items;
 }
@@ -400,10 +457,16 @@ async function buildFromLocal(publicBase) {
     }),
   );
   for (const item of items) {
-    const origName = findOriginalName(item.id, originals);
-    const dims = await attachDimensionsLocal(item, origName);
-    Object.assign(item, dims);
-    console.log("尺寸", item.thumbName, dims.originalWidth, "×", dims.originalHeight);
+    const meta = await attachThumbMetaLocal(item);
+    Object.assign(item, meta);
+    console.log(
+      "缩略图",
+      item.thumbName,
+      meta.thumbWidth,
+      "×",
+      meta.thumbHeight,
+      meta.thumbHashBase64 ? `+ ThumbHash (${meta.thumbHashBase64.length}B b64)` : "",
+    );
   }
   return items;
 }
@@ -451,10 +514,11 @@ const cmd = process.argv[2];
 async function main() {
   if (cmd === "pull") await pull();
   else if (cmd === "push") await push();
+  else if (cmd === "generate-thumbs") await generateThumbs();
   else if (cmd === "build-json") await buildJson();
   else {
     console.error(
-      "用法: node scripts/gallery.mjs pull | push | build-json",
+      "用法: node scripts/gallery.mjs pull | push | generate-thumbs | build-json",
     );
     process.exit(1);
   }

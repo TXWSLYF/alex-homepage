@@ -1,22 +1,244 @@
 "use client";
 
 import type { GalleryItem } from "@/lib/gallery";
-import { X } from "lucide-react";
-import { useCallback, useEffect, useState } from "react";
+import { thumbHashBase64ToDataUrl } from "@/lib/thumbhash-dataurl";
+import { Loader2, X } from "lucide-react";
+import {
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 
 type Props = {
   items: GalleryItem[];
 };
 
+function GalleryThumbTile({
+  item,
+  onOpen,
+}: {
+  item: GalleryItem;
+  onOpen: () => void;
+}) {
+  const [loaded, setLoaded] = useState(false);
+  const thumbRef = useRef<HTMLImageElement>(null);
+  const w = item.thumbWidth ?? item.originalWidth;
+  const h = item.thumbHeight ?? item.originalHeight;
+  const hasRatio =
+    typeof w === "number" && typeof h === "number" && w > 0 && h > 0;
+
+  const placeholderSrc = useMemo(() => {
+    if (!item.thumbHashBase64) return null;
+    try {
+      return thumbHashBase64ToDataUrl(item.thumbHashBase64);
+    } catch {
+      return null;
+    }
+  }, [item.thumbHashBase64]);
+
+  const usePlaceholderFade = Boolean(placeholderSrc);
+
+  /** 磁盘/内存缓存常在绑定 onLoad 前就已 decode 完成，必须读 complete，否则会永远停在模糊层 */
+  useLayoutEffect(() => {
+    setLoaded(false);
+    const el = thumbRef.current;
+    if (!el) return;
+    const sync = () => {
+      if (el.complete && el.naturalWidth > 0) {
+        setLoaded(true);
+      }
+    };
+    sync();
+    el.addEventListener("load", sync);
+    return () => el.removeEventListener("load", sync);
+  }, [item.thumbnailUrl]);
+
+  return (
+    <button
+      type="button"
+      role="listitem"
+      onClick={onOpen}
+      className="group mb-4 w-full break-inside-avoid cursor-zoom-in rounded-2xl border border-border-base/80 bg-muted/40 text-left shadow-[0_12px_40px_-18px_rgba(0,0,0,0.35)] transition hover:border-brand/40 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand"
+    >
+      <div
+        className={`relative w-full overflow-hidden rounded-2xl ${hasRatio ? "bg-muted" : ""}`}
+        style={hasRatio ? { aspectRatio: `${w} / ${h}` } : undefined}
+      >
+        {placeholderSrc && (
+          <>
+            {/* ThumbHash 解码为 PNG data URL */}
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={placeholderSrc}
+              alt=""
+              className="absolute inset-0 h-full w-full object-cover"
+              aria-hidden
+            />
+          </>
+        )}
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          ref={thumbRef}
+          src={item.thumbnailUrl}
+          alt=""
+          width={hasRatio ? w : undefined}
+          height={hasRatio ? h : undefined}
+          loading="lazy"
+          decoding="async"
+          onLoad={() => setLoaded(true)}
+          onError={() => setLoaded(true)}
+          className={
+            hasRatio
+              ? `absolute inset-0 h-full w-full object-cover transition-opacity duration-300 group-hover:scale-[1.02] ${
+                  usePlaceholderFade
+                    ? loaded
+                      ? "opacity-100"
+                      : "opacity-0"
+                    : "opacity-100"
+                }`
+              : "h-auto w-full object-cover transition duration-300 group-hover:scale-[1.02]"
+          }
+        />
+        <span className="pointer-events-none absolute inset-x-0 bottom-0 bg-linear-to-t from-black/55 to-transparent px-3 py-3 pt-10 text-xs font-medium text-white opacity-0 transition group-hover:opacity-100">
+          {item.thumbName}
+        </span>
+      </div>
+    </button>
+  );
+}
+
+const LIGHTBOX_VH_CAP = "min(82vh, 82dvh)";
+
+function GalleryLightboxContent({
+  item,
+  onClose,
+}: {
+  item: GalleryItem;
+  onClose: () => void;
+}) {
+  const [fullLoaded, setFullLoaded] = useState(false);
+  const arW = item.thumbWidth ?? item.originalWidth;
+  const arH = item.thumbHeight ?? item.originalHeight;
+  const hasRatio =
+    typeof arW === "number" &&
+    typeof arH === "number" &&
+    arW > 0 &&
+    arH > 0;
+
+  const placeholderSrc = useMemo(() => {
+    if (!item.thumbHashBase64) return null;
+    try {
+      return thumbHashBase64ToDataUrl(item.thumbHashBase64);
+    } catch {
+      return null;
+    }
+  }, [item.thumbHashBase64]);
+
+  const fullSrc = item.originalUrl ?? item.thumbnailUrl;
+  const useFade = Boolean(placeholderSrc);
+  const fullImgRef = useRef<HTMLImageElement>(null);
+
+  useLayoutEffect(() => {
+    const el = fullImgRef.current;
+    if (el?.complete && el.naturalWidth > 0) {
+      setFullLoaded(true);
+    }
+  }, [fullSrc]);
+
+  const frameStyle = hasRatio
+    ? {
+        aspectRatio: `${arW} / ${arH}`,
+        maxHeight: LIGHTBOX_VH_CAP,
+        width: `min(100%, min(1200px, calc(${LIGHTBOX_VH_CAP} * ${arW} / ${arH})))`,
+        marginInline: "auto" as const,
+      }
+    : {
+        minHeight: "40vh",
+        width: "min(100%, 1200px)" as const,
+        marginInline: "auto" as const,
+      };
+
+  return (
+    <>
+      <button
+        type="button"
+        className="absolute right-4 top-4 z-10 rounded-full bg-white/10 p-2 text-white transition hover:bg-white/20"
+        onClick={onClose}
+        aria-label="关闭"
+      >
+        <X className="h-5 w-5" />
+      </button>
+      <div
+        className="pointer-events-auto flex w-full max-w-[min(100%,1200px)] flex-col items-center px-2"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div
+          className="relative shrink-0 overflow-hidden rounded-lg bg-neutral-900/55 shadow-2xl"
+          style={frameStyle}
+          aria-busy={!fullLoaded}
+        >
+          {placeholderSrc && (
+            <>
+              {/* ThumbHash 解码图只有约 32px 固有尺寸，须 h/w 拉满 + object-cover，否则会缩成一小块 */}
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={placeholderSrc}
+                alt=""
+                className="absolute inset-0 z-0 h-full w-full object-cover"
+                aria-hidden
+              />
+            </>
+          )}
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            ref={fullImgRef}
+            src={fullSrc}
+            alt=""
+            width={hasRatio ? arW : undefined}
+            height={hasRatio ? arH : undefined}
+            decoding="async"
+            onLoad={() => setFullLoaded(true)}
+            onError={() => setFullLoaded(true)}
+            className={`absolute inset-0 z-10 h-full w-full object-contain ${
+              useFade
+                ? fullLoaded
+                  ? "opacity-100"
+                  : "opacity-0"
+                : "opacity-100"
+            } transition-opacity duration-300`}
+          />
+          {!fullLoaded && (
+            <div
+              className="absolute inset-0 z-8 flex flex-col items-center justify-center gap-2 bg-black/30 pointer-events-none"
+              role="status"
+              aria-live="polite"
+            >
+              <Loader2
+                className="h-9 w-9 animate-spin text-white/85"
+                aria-hidden
+              />
+              <span className="text-xs font-medium text-white/75">加载中…</span>
+            </div>
+          )}
+        </div>
+        {/* 固定占位高度，避免原图加载把文字顶下去造成 CLS */}
+        <p className="mt-4 min-h-10 w-full shrink-0 pt-1 text-center text-xs leading-relaxed text-white/80">
+          {item.thumbName}
+        </p>
+      </div>
+    </>
+  );
+}
+
 export function GalleryWaterfall({ items }: Props) {
   const [open, setOpen] = useState<GalleryItem | null>(null);
 
-  const onKey = useCallback(
-    (e: KeyboardEvent) => {
-      if (e.key === "Escape") setOpen(null);
-    },
-    [],
-  );
+  const onKey = useCallback((e: KeyboardEvent) => {
+    if (e.key === "Escape") setOpen(null);
+  }, []);
 
   useEffect(() => {
     if (!open) return;
@@ -55,52 +277,13 @@ export function GalleryWaterfall({ items }: Props) {
         className="columns-1 gap-4 sm:columns-2 lg:columns-3 xl:columns-4"
         role="list"
       >
-        {items.map((item) => {
-          const w = item.originalWidth;
-          const h = item.originalHeight;
-          const hasRatio =
-            typeof w === "number" &&
-            typeof h === "number" &&
-            w > 0 &&
-            h > 0;
-          return (
-          <button
-            key={item.id}
-            type="button"
-            role="listitem"
-            onClick={() => setOpen(item)}
-            className="group mb-4 w-full break-inside-avoid cursor-zoom-in rounded-2xl border border-border-base/80 bg-muted/40 text-left shadow-[0_12px_40px_-18px_rgba(0,0,0,0.35)] transition hover:border-brand/40 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand"
-          >
-            <div
-              className={`relative w-full overflow-hidden rounded-2xl ${hasRatio ? "bg-muted" : ""}`}
-              style={
-                hasRatio
-                  ? { aspectRatio: `${w} / ${h}` }
-                  : undefined
-              }
-            >
-              {/* 使用原生 img：清单里的公开 URL 域名随 R2 配置变化，避免改 next.config */}
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src={item.thumbnailUrl}
-                alt=""
-                width={hasRatio ? w : undefined}
-                height={hasRatio ? h : undefined}
-                loading="lazy"
-                decoding="async"
-                className={
-                  hasRatio
-                    ? "absolute inset-0 h-full w-full object-cover transition duration-300 group-hover:scale-[1.02]"
-                    : "h-auto w-full object-cover transition duration-300 group-hover:scale-[1.02]"
-                }
-              />
-              <span className="pointer-events-none absolute inset-x-0 bottom-0 bg-linear-to-t from-black/55 to-transparent px-3 py-3 pt-10 text-xs font-medium text-white opacity-0 transition group-hover:opacity-100">
-                {item.thumbName}
-              </span>
-            </div>
-          </button>
-          );
-        })}
+        {items.map((item) => (
+          <GalleryThumbTile
+            key={`${item.id}-${item.thumbnailUrl}`}
+            item={item}
+            onOpen={() => setOpen(item)}
+          />
+        ))}
       </div>
 
       {open && (
@@ -111,28 +294,11 @@ export function GalleryWaterfall({ items }: Props) {
           aria-label="大图预览"
           onClick={() => setOpen(null)}
         >
-          <button
-            type="button"
-            className="absolute right-4 top-4 rounded-full bg-white/10 p-2 text-white transition hover:bg-white/20"
-            onClick={() => setOpen(null)}
-            aria-label="关闭"
-          >
-            <X className="h-5 w-5" />
-          </button>
-          <div
-            className="relative max-h-[90vh] max-w-[min(100%,1200px)] overflow-auto"
-            onClick={(e) => e.stopPropagation()}
-          >
-            {/* eslint-disable-next-line @next/next/no-img-element -- 原图 URL 来自清单，避免限定域名 */}
-            <img
-              src={open.originalUrl ?? open.thumbnailUrl}
-              alt=""
-              className="max-h-[90vh] w-auto max-w-full rounded-lg object-contain shadow-2xl"
-            />
-            <p className="mt-3 text-center text-xs text-white/80">
-              {open.thumbName}
-            </p>
-          </div>
+          <GalleryLightboxContent
+            key={`${open.id}-${open.originalUrl ?? open.thumbnailUrl}`}
+            item={open}
+            onClose={() => setOpen(null)}
+          />
         </div>
       )}
     </>
