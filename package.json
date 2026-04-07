@@ -4,12 +4,16 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "prebuild": "node scripts/copy-blog-media.mjs",
+    "prebuild": "node scripts/copy-blog-media.mjs && node scripts/gallery.mjs build-json",
+    "gallery:pull": "node scripts/gallery.mjs pull",
+    "gallery:push": "node scripts/gallery.mjs push",
+    "gallery:build": "node scripts/gallery.mjs build-json",
     "build": "next build",
     "start": "next start",
     "lint": "eslint"
   },
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.1025.0",
     "gray-matter": "^4.0.3",
     "lucide-react": "^1.7.0",
     "motion": "^12.38.0",
@@ -29,6 +33,7 @@
     "@types/react-dom": "^19",
     "eslint": "^9",
     "eslint-config-next": "16.2.2",
+    "image-size": "^2.0.2",
     "tailwindcss": "^4",
     "typescript": "^5"
   }
