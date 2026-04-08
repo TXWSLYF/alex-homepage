@@ -116,8 +116,6 @@ function GalleryThumbTile({
   );
 }
 
-const LIGHTBOX_VH_CAP = "min(82vh, 82dvh)";
-
 function GalleryLightboxContent({
   item,
   onClose,
@@ -127,6 +125,7 @@ function GalleryLightboxContent({
 }) {
   const [fullLoaded, setFullLoaded] = useState(false);
   const [zoom, setZoom] = useState({ scale: 1, x: 0, y: 0 });
+  const [isInteracting, setIsInteracting] = useState(false);
   const zoomRef = useRef(zoom);
   const pointersRef = useRef(
     new Map<number, { x: number; y: number }>(),
@@ -224,6 +223,7 @@ function GalleryLightboxContent({
     // Only react to primary button on mouse; touch/pen ok.
     if (e.pointerType === "mouse" && e.button !== 0) return;
     (e.currentTarget as HTMLElement).setPointerCapture?.(e.pointerId);
+    setIsInteracting(true);
     pointersRef.current.set(e.pointerId, { x: e.clientX, y: e.clientY });
 
     const pts = Array.from(pointersRef.current.values());
@@ -296,7 +296,10 @@ function GalleryLightboxContent({
   const onPointerUpOrCancel = useCallback((e: React.PointerEvent) => {
     pointersRef.current.delete(e.pointerId);
     if (pointersRef.current.size < 2) pinchRef.current = null;
-    if (pointersRef.current.size === 0) dragRef.current = null;
+    if (pointersRef.current.size === 0) {
+      dragRef.current = null;
+      queueMicrotask(() => setIsInteracting(false));
+    }
   }, []);
 
   const onWheel = useCallback(
@@ -318,8 +321,8 @@ function GalleryLightboxContent({
   const frameStyle = hasRatio
     ? {
         aspectRatio: `${arW} / ${arH}`,
-        maxHeight: LIGHTBOX_VH_CAP,
-        width: `min(100%, min(1200px, calc(${LIGHTBOX_VH_CAP} * ${arW} / ${arH})))`,
+        maxHeight: "min(86vh, 86dvh)",
+        width: "min(100%, 1200px)",
         marginInline: "auto" as const,
       }
     : {
@@ -388,6 +391,9 @@ function GalleryLightboxContent({
             style={{
               transform: `translate3d(${zoom.x}px, ${zoom.y}px, 0) scale(${zoom.scale})`,
               transformOrigin: "center",
+              transition: isInteracting
+                ? "none"
+                : "transform 220ms cubic-bezier(0.22, 1, 0.36, 1)",
               touchAction: "none",
               willChange: "transform",
             }}
@@ -474,7 +480,7 @@ export function GalleryWaterfall({ items }: Props) {
       {open &&
         createPortal(
           <div
-            className="fixed inset-0 z-100 flex items-center justify-center bg-black/80 p-4 backdrop-blur-sm"
+            className="fixed inset-0 z-100 flex items-center justify-center bg-black/80 p-2 backdrop-blur-sm sm:p-4"
             role="dialog"
             aria-modal="true"
             aria-label="大图预览"
