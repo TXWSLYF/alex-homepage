@@ -1,7 +1,16 @@
 {
-  "generatedAt": "2026-04-07T04:31:24.298Z",
+  "generatedAt": "2026-04-08T02:37:19.119Z",
   "publicBaseUrl": "https://pub-98482c38eca64dbe97c319bbed26cad3.r2.dev",
   "items": [
+    {
+      "id": "DSC00076",
+      "thumbName": "DSC00076.webp",
+      "thumbnailUrl": "https://pub-98482c38eca64dbe97c319bbed26cad3.r2.dev/gallery/thumbs/1600w/DSC00076.webp",
+      "originalUrl": "https://pub-98482c38eca64dbe97c319bbed26cad3.r2.dev/gallery/originals/DSC00076.JPG",
+      "thumbWidth": 1600,
+      "thumbHeight": 1067,
+      "thumbHashBase64": "IrYVFYJod3iPeHd1iHh3h4mPm4r4"
+    },
     {
       "id": "DSC00681",
       "thumbName": "DSC00681.webp",
@@ -73,6 +82,15 @@
       "thumbWidth": 1600,
       "thumbHeight": 1066,
       "thumbHashBase64": "2zgOFYKHaHhwh3eIh7iIdmBqB5Z2"
+    },
+    {
+      "id": "DSC02502",
+      "thumbName": "DSC02502.webp",
+      "thumbnailUrl": "https://pub-98482c38eca64dbe97c319bbed26cad3.r2.dev/gallery/thumbs/1600w/DSC02502.webp",
+      "originalUrl": "https://pub-98482c38eca64dbe97c319bbed26cad3.r2.dev/gallery/originals/DSC02502.JPG",
+      "thumbWidth": 1600,
+      "thumbHeight": 1067,
+      "thumbHashBase64": "VPgNDYJVx3ageZR5lpiHdjhvBFdZ"
     },
     {
       "id": "DSC03079",

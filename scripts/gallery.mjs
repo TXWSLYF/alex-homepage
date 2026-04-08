@@ -7,12 +7,14 @@
  *
  * 用法：
  *   node scripts/gallery.mjs pull|push|generate-thumbs|build-json
+ *   pull / push 默认跳过已同步文件（本地已有、或 R2 已有且大小一致）；加 --force 全量拉取/上传
  *   generate-thumbs 可加 --force 忽略「缩略图已比原图新」的跳过逻辑
  *
  * 环境变量见 .env.gallery.example；可放在 .env.gallery（需自行创建，已 gitignore）。
  */
 import {
   GetObjectCommand,
+  HeadObjectCommand,
   ListObjectsV2Command,
   PutObjectCommand,
   S3Client,
@@ -127,8 +129,32 @@ function keyToLocalRel(key, prefix) {
   return key.slice(pref.length);
 }
 
+async function localFileExistsNonEmpty(filePath) {
+  try {
+    const s = await stat(filePath);
+    return s.isFile() && s.size > 0;
+  } catch {
+    return false;
+  }
+}
+
+/** R2 上对象是否存在；存在时返回字节数 */
+async function r2ObjectSize(client, key) {
+  try {
+    const out = await client.send(
+      new HeadObjectCommand({ Bucket: bucket(), Key: key }),
+    );
+    return out.ContentLength ?? 0;
+  } catch (e) {
+    const code = e?.$metadata?.httpStatusCode;
+    if (code === 404 || e?.name === "NotFound") return null;
+    throw e;
+  }
+}
+
 async function pull() {
   await loadEnvGallery();
+  const force = process.argv.includes("--force");
   const client = s3Client();
   const dirs = [
     { prefix: R2_PREFIX_ORIGINALS, local: localOriginalsDir() },
@@ -142,6 +168,15 @@ async function pull() {
       if (!rel) continue;
       const dest = path.join(local, rel);
       await mkdir(path.dirname(dest), { recursive: true });
+      if (!force && (await localFileExistsNonEmpty(dest))) {
+        console.log(
+          "跳过 pull（本地已存在）",
+          key,
+          "->",
+          path.relative(root, dest),
+        );
+        continue;
+      }
       const out = await client.send(
         new GetObjectCommand({ Bucket: bucket(), Key: key }),
       );
@@ -169,6 +204,7 @@ async function collectFilesRecursive(dir, base = dir) {
 
 async function push() {
   await loadEnvGallery();
+  const force = process.argv.includes("--force");
   const client = s3Client();
   const pairs = [
     { prefix: R2_PREFIX_ORIGINALS, local: localOriginalsDir() },
@@ -186,6 +222,15 @@ async function push() {
     const files = await collectFilesRecursive(local);
     for (const { full, rel } of files) {
       const key = `${prefix}/${rel.split(path.sep).join("/")}`;
+      const st = await stat(full);
+      const localSize = st.size;
+      if (!force && localSize > 0) {
+        const remoteSize = await r2ObjectSize(client, key);
+        if (remoteSize !== null && remoteSize === localSize) {
+          console.log("跳过 push（R2 已存在且大小一致）", key);
+          continue;
+        }
+      }
       const body = createReadStream(full);
       await client.send(
         new PutObjectCommand({
