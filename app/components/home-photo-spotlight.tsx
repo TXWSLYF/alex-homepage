@@ -1,23 +1,37 @@
 "use client";
 
-// TODO: After `/gallery` is fleshed out, load the full gallery set from a single source
-// and show 4 randomly chosen photos here on each visit (SSR shuffle or client-side pick).
-
-import type { PhotoSpotlightItem } from "@/content/photos";
-import { photoSpotlightItems } from "@/content/photos";
 import { softTransition, staggerDelay } from "@/lib/motion-presets";
+import type { GalleryManifest } from "@/lib/gallery";
+import manifest from "@/data/gallery.json";
 import Image from "next/image";
 import Link from "next/link";
-import { Reorder, useReducedMotion } from "motion/react";
+import { motion, useReducedMotion } from "motion/react";
 import { ArrowUpRight } from "lucide-react";
-import { useCallback, useState } from "react";
+import { useEffect, useState } from "react";
+
+const data = manifest as GalleryManifest;
+
+function pickRandom<T>(arr: readonly T[], count: number): T[] {
+  if (count <= 0) return [];
+  if (arr.length <= count) return [...arr];
+  const copy = [...arr];
+  // Fisher–Yates shuffle partial
+  for (let i = copy.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [copy[i], copy[j]] = [copy[j], copy[i]];
+  }
+  return copy.slice(0, count);
+}
 
 export function HomePhotoSpotlight() {
   const reduced = useReducedMotion();
-  const [items, setItems] = useState(() => [...photoSpotlightItems]);
+  const [items, setItems] = useState(() => [] as GalleryManifest["items"]);
 
-  const onReorder = useCallback((next: PhotoSpotlightItem[]) => {
-    setItems(next);
+  // Avoid hydration mismatch: SSR + client must render the same initial markup.
+  // Pick randomly only after client mount.
+  useEffect(() => {
+    const pickFrom = data.items.filter((it) => Boolean(it.thumbnailUrl));
+    queueMicrotask(() => setItems(pickRandom(pickFrom, 4)));
   }, []);
 
   return (
@@ -45,17 +59,13 @@ export function HomePhotoSpotlight() {
       </div>
 
       <div className="relative min-h-[220px] sm:min-h-[260px]">
-        <Reorder.Group
-          axis="x"
-          values={items}
-          onReorder={onReorder}
+        <ul
           className="isolate flex flex-wrap content-start justify-center gap-3 sm:gap-4"
           aria-label="Featured photos"
         >
-          {items.map((photo, i) => (
-            <Reorder.Item
-              key={photo.id}
-              value={photo}
+          {(items.length > 0 ? items : new Array(4).fill(null)).map((photo, i) => (
+            <motion.li
+              key={photo?.id ?? `placeholder-${i}`}
               className="relative aspect-4/5 w-[calc(50%-0.375rem)] max-w-[calc(50%-0.375rem)] flex-[0_0_auto] cursor-default overflow-hidden rounded-2xl border border-border-base/80 bg-muted shadow-[0_12px_40px_-16px_rgba(0,0,0,0.35)] sm:w-[calc(25%-0.75rem)] sm:max-w-[calc(25%-0.75rem)]"
               initial={
                 reduced
@@ -87,22 +97,22 @@ export function HomePhotoSpotlight() {
                       transition: { duration: 0.25 },
                     }
               }
-              whileDrag={{ scale: 1.05, rotate: 0 }}
             >
-              <Image
-                src={photo.src}
-                alt={photo.alt ?? photo.label}
-                fill
-                draggable={false}
-                sizes="(max-width: 640px) 45vw, 22vw"
-                className="pointer-events-none object-cover select-none"
-              />
-              <span className="absolute bottom-3 left-3 z-10 rounded-full bg-background/70 px-2.5 py-1 text-xs font-medium text-text-main backdrop-blur-sm dark:bg-surface-muted/80">
-                {photo.label}
-              </span>
-            </Reorder.Item>
+              {photo ? (
+                <Image
+                  src={photo.thumbnailUrl}
+                  alt={photo.thumbName ?? "Featured photo"}
+                  fill
+                  draggable={false}
+                  sizes="(max-width: 640px) 45vw, 22vw"
+                  className="pointer-events-none object-cover select-none"
+                />
+              ) : (
+                <div className="absolute inset-0 bg-linear-to-br from-muted to-surface-muted" />
+              )}
+            </motion.li>
           ))}
-        </Reorder.Group>
+        </ul>
       </div>
     </section>
   );
