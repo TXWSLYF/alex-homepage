@@ -11,6 +11,7 @@ import {
   useRef,
   useState,
 } from "react";
+import { createPortal } from "react-dom";
 
 type Props = {
   items: GalleryItem[];
@@ -43,7 +44,6 @@ function GalleryThumbTile({
 
   /** 磁盘/内存缓存常在绑定 onLoad 前就已 decode 完成，必须读 complete，否则会永远停在模糊层 */
   useLayoutEffect(() => {
-    setLoaded(false);
     const el = thumbRef.current;
     if (!el) return;
     const sync = () => {
@@ -51,7 +51,7 @@ function GalleryThumbTile({
         setLoaded(true);
       }
     };
-    sync();
+    queueMicrotask(sync);
     el.addEventListener("load", sync);
     return () => el.removeEventListener("load", sync);
   }, [item.thumbnailUrl]);
@@ -64,7 +64,9 @@ function GalleryThumbTile({
       className="group mb-4 w-full break-inside-avoid cursor-zoom-in rounded-2xl border border-border-base/80 bg-muted/40 text-left shadow-[0_12px_40px_-18px_rgba(0,0,0,0.35)] transition hover:border-brand/40 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand"
     >
       <div
-        className={`relative w-full overflow-hidden rounded-2xl ${hasRatio ? "bg-muted" : ""}`}
+        className={`relative w-full overflow-hidden rounded-2xl ${
+          hasRatio ? "bg-muted" : ""
+        }`}
         style={hasRatio ? { aspectRatio: `${w} / ${h}` } : undefined}
       >
         {placeholderSrc && (
@@ -120,13 +122,11 @@ function GalleryLightboxContent({
   onClose: () => void;
 }) {
   const [fullLoaded, setFullLoaded] = useState(false);
+
   const arW = item.thumbWidth ?? item.originalWidth;
   const arH = item.thumbHeight ?? item.originalHeight;
   const hasRatio =
-    typeof arW === "number" &&
-    typeof arH === "number" &&
-    arW > 0 &&
-    arH > 0;
+    typeof arW === "number" && typeof arH === "number" && arW > 0 && arH > 0;
 
   const placeholderSrc = useMemo(() => {
     if (!item.thumbHashBase64) return null;
@@ -141,11 +141,17 @@ function GalleryLightboxContent({
   const useFade = Boolean(placeholderSrc);
   const fullImgRef = useRef<HTMLImageElement>(null);
 
+  /**
+   * 大图只用 <img src> 加载，与「用 fetch 读 body 算进度」不同：跨域图片在 img 里可以显示，
+   * 但 fetch 默认会受 CORS 限制，且 Strict Mode 里 abort 会产生 canceled。因此不再预 fetch。
+   */
   useLayoutEffect(() => {
-    const el = fullImgRef.current;
-    if (el?.complete && el.naturalWidth > 0) {
-      setFullLoaded(true);
-    }
+    queueMicrotask(() => {
+      const el = fullImgRef.current;
+      if (el?.complete && el.naturalWidth > 0) {
+        setFullLoaded(true);
+      }
+    });
   }, [fullSrc]);
 
   const frameStyle = hasRatio
@@ -212,15 +218,18 @@ function GalleryLightboxContent({
           />
           {!fullLoaded && (
             <div
-              className="absolute inset-0 z-8 flex flex-col items-center justify-center gap-2 bg-black/30 pointer-events-none"
+              className="pointer-events-none absolute bottom-3 right-3 z-20 flex max-w-[calc(100%-1.5rem)] items-center gap-2.5 rounded-xl bg-black/65 px-3 py-2 shadow-lg ring-1 ring-white/10 backdrop-blur-md"
               role="status"
               aria-live="polite"
+              aria-busy
             >
               <Loader2
-                className="h-9 w-9 animate-spin text-white/85"
+                className="h-4 w-4 shrink-0 animate-spin text-white/90"
                 aria-hidden
               />
-              <span className="text-xs font-medium text-white/75">加载中…</span>
+              <span className="text-xs font-medium leading-tight text-white">
+                Loading
+              </span>
             </div>
           )}
         </div>
@@ -286,21 +295,23 @@ export function GalleryWaterfall({ items }: Props) {
         ))}
       </div>
 
-      {open && (
-        <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4 backdrop-blur-sm"
-          role="dialog"
-          aria-modal="true"
-          aria-label="大图预览"
-          onClick={() => setOpen(null)}
-        >
-          <GalleryLightboxContent
-            key={`${open.id}-${open.originalUrl ?? open.thumbnailUrl}`}
-            item={open}
-            onClose={() => setOpen(null)}
-          />
-        </div>
-      )}
+      {open &&
+        createPortal(
+          <div
+            className="fixed inset-0 z-100 flex items-center justify-center bg-black/80 p-4 backdrop-blur-sm"
+            role="dialog"
+            aria-modal="true"
+            aria-label="大图预览"
+            onClick={() => setOpen(null)}
+          >
+            <GalleryLightboxContent
+              key={`${open.id}-${open.originalUrl ?? open.thumbnailUrl}`}
+              item={open}
+              onClose={() => setOpen(null)}
+            />
+          </div>,
+          document.body
+        )}
     </>
   );
 }

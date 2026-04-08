@@ -45,15 +45,6 @@ function navLinkActive(pathname: string, href: string) {
   return pathname === href || pathname.startsWith(`${href}/`);
 }
 
-function NavDivider() {
-  return (
-    <span
-      className="mx-1 h-5 w-px shrink-0 self-center bg-border-base/80"
-      aria-hidden
-    />
-  );
-}
-
 export function FloatingNav() {
   const pathname = usePathname();
   const dark = useIsDarkHtml();
@@ -85,8 +76,6 @@ export function FloatingNav() {
           <Home aria-hidden size={iconSize} strokeWidth={iconStroke} />
         </Link>
 
-        <NavDivider />
-
         <div className="flex items-center gap-0.5 px-0 sm:gap-1 sm:px-0.5">
           {links.map(({ href, label, Icon }) => {
             const active = navLinkActive(pathname, href);
@@ -114,8 +103,6 @@ export function FloatingNav() {
             );
           })}
         </div>
-
-        <NavDivider />
 
         <button
           type="button"

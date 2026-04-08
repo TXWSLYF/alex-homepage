@@ -95,6 +95,7 @@ export function HomeHero() {
                     height={24}
                     unoptimized
                     className="h-5 w-auto max-w-full rounded-[4px] sm:h-6"
+                    style={{ width: "auto" }}
                   />
                 </li>
               ))}
