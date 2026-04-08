@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-04-08T02:37:19.119Z",
+  "generatedAt": "2026-04-08T02:41:37.584Z",
   "publicBaseUrl": "https://pub-98482c38eca64dbe97c319bbed26cad3.r2.dev",
   "items": [
     {
@@ -334,15 +334,6 @@
       "thumbWidth": 1600,
       "thumbHeight": 1067,
       "thumbHashBase64": "9BcGDYL3OIeJdoiOcmqXdQeGgXAH"
-    },
-    {
-      "id": "image",
-      "thumbName": "image.webp",
-      "thumbnailUrl": "https://pub-98482c38eca64dbe97c319bbed26cad3.r2.dev/gallery/thumbs/1600w/image.webp",
-      "originalUrl": "https://pub-98482c38eca64dbe97c319bbed26cad3.r2.dev/gallery/originals/image.jpeg",
-      "thumbWidth": 1600,
-      "thumbHeight": 1067,
-      "thumbHashBase64": "XRgGDYK0WppSvZm8mgeJlQJ4NZA2"
     }
   ]
 }
