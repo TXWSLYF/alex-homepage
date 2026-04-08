@@ -17,6 +17,10 @@ type Props = {
   items: GalleryItem[];
 };
 
+function clamp(n: number, min: number, max: number) {
+  return Math.max(min, Math.min(max, n));
+}
+
 function GalleryThumbTile({
   item,
   onOpen,
@@ -122,6 +126,25 @@ function GalleryLightboxContent({
   onClose: () => void;
 }) {
   const [fullLoaded, setFullLoaded] = useState(false);
+  const [zoom, setZoom] = useState({ scale: 1, x: 0, y: 0 });
+  const zoomRef = useRef(zoom);
+  const pointersRef = useRef(
+    new Map<number, { x: number; y: number }>(),
+  );
+  const pinchRef = useRef<{
+    startScale: number;
+    startX: number;
+    startY: number;
+    startDist: number;
+    startCenterX: number;
+    startCenterY: number;
+  } | null>(null);
+  const dragRef = useRef<{
+    startX: number;
+    startY: number;
+    startTx: number;
+    startTy: number;
+  } | null>(null);
 
   const arW = item.thumbWidth ?? item.originalWidth;
   const arH = item.thumbHeight ?? item.originalHeight;
@@ -140,6 +163,7 @@ function GalleryLightboxContent({
   const fullSrc = item.originalUrl ?? item.thumbnailUrl;
   const useFade = Boolean(placeholderSrc);
   const fullImgRef = useRef<HTMLImageElement>(null);
+  const frameRef = useRef<HTMLDivElement>(null);
 
   /**
    * 大图只用 <img src> 加载，与「用 fetch 读 body 算进度」不同：跨域图片在 img 里可以显示，
@@ -153,6 +177,143 @@ function GalleryLightboxContent({
       }
     });
   }, [fullSrc]);
+
+  useEffect(() => {
+    queueMicrotask(() => setZoom({ scale: 1, x: 0, y: 0 }));
+    pointersRef.current.clear();
+    pinchRef.current = null;
+    dragRef.current = null;
+  }, [fullSrc]);
+
+  useEffect(() => {
+    zoomRef.current = zoom;
+  }, [zoom]);
+
+  const setZoomClamped = useCallback((next: { scale: number; x: number; y: number }) => {
+    const el = frameRef.current;
+    if (!el) {
+      setZoom(next);
+      return;
+    }
+    const rect = el.getBoundingClientRect();
+    const scale = clamp(next.scale, 1, 4);
+    const maxX = Math.max(0, ((scale - 1) * rect.width) / 2);
+    const maxY = Math.max(0, ((scale - 1) * rect.height) / 2);
+    setZoom({
+      scale,
+      x: clamp(next.x, -maxX, maxX),
+      y: clamp(next.y, -maxY, maxY),
+    });
+  }, []);
+
+  const onDoubleClick = useCallback(
+    (e: React.MouseEvent) => {
+      e.preventDefault();
+      e.stopPropagation();
+      const cur = zoomRef.current;
+      if (cur.scale > 1.01) {
+        setZoom({ scale: 1, x: 0, y: 0 });
+      } else {
+        setZoomClamped({ scale: 2, x: cur.x, y: cur.y });
+      }
+    },
+    [setZoomClamped],
+  );
+
+  const onPointerDown = useCallback((e: React.PointerEvent) => {
+    // Only react to primary button on mouse; touch/pen ok.
+    if (e.pointerType === "mouse" && e.button !== 0) return;
+    (e.currentTarget as HTMLElement).setPointerCapture?.(e.pointerId);
+    pointersRef.current.set(e.pointerId, { x: e.clientX, y: e.clientY });
+
+    const pts = Array.from(pointersRef.current.values());
+    const cur = zoomRef.current;
+    if (pts.length === 2) {
+      const [a, b] = pts;
+      const dx = b.x - a.x;
+      const dy = b.y - a.y;
+      const dist = Math.hypot(dx, dy) || 1;
+      pinchRef.current = {
+        startScale: cur.scale,
+        startX: cur.x,
+        startY: cur.y,
+        startDist: dist,
+        startCenterX: (a.x + b.x) / 2,
+        startCenterY: (a.y + b.y) / 2,
+      };
+      dragRef.current = null;
+      return;
+    }
+
+    if (pts.length === 1 && cur.scale > 1.01) {
+      dragRef.current = {
+        startX: e.clientX,
+        startY: e.clientY,
+        startTx: cur.x,
+        startTy: cur.y,
+      };
+    }
+  }, []);
+
+  const onPointerMove = useCallback(
+    (e: React.PointerEvent) => {
+      if (!pointersRef.current.has(e.pointerId)) return;
+      pointersRef.current.set(e.pointerId, { x: e.clientX, y: e.clientY });
+
+      const pts = Array.from(pointersRef.current.values());
+      if (pts.length === 2 && pinchRef.current) {
+        const [a, b] = pts;
+        const dx = b.x - a.x;
+        const dy = b.y - a.y;
+        const dist = Math.hypot(dx, dy) || 1;
+        const ratio = dist / (pinchRef.current.startDist || 1);
+        const nextScale = clamp(pinchRef.current.startScale * ratio, 1, 4);
+
+        // Keep pan roughly following finger center delta.
+        const cx = (a.x + b.x) / 2;
+        const cy = (a.y + b.y) / 2;
+        const dcx = cx - pinchRef.current.startCenterX;
+        const dcy = cy - pinchRef.current.startCenterY;
+        const nextX = pinchRef.current.startX + dcx;
+        const nextY = pinchRef.current.startY + dcy;
+        setZoomClamped({ scale: nextScale, x: nextX, y: nextY });
+        return;
+      }
+
+      if (pts.length === 1 && dragRef.current && zoomRef.current.scale > 1.01) {
+        const dx = e.clientX - dragRef.current.startX;
+        const dy = e.clientY - dragRef.current.startY;
+        setZoomClamped({
+          scale: zoomRef.current.scale,
+          x: dragRef.current.startTx + dx,
+          y: dragRef.current.startTy + dy,
+        });
+      }
+    },
+    [setZoomClamped],
+  );
+
+  const onPointerUpOrCancel = useCallback((e: React.PointerEvent) => {
+    pointersRef.current.delete(e.pointerId);
+    if (pointersRef.current.size < 2) pinchRef.current = null;
+    if (pointersRef.current.size === 0) dragRef.current = null;
+  }, []);
+
+  const onWheel = useCallback(
+    (e: React.WheelEvent) => {
+      // Trackpad/mouse zoom with Ctrl/Meta (Safari/Chrome).
+      if (!e.ctrlKey && !e.metaKey) return;
+      e.preventDefault();
+      e.stopPropagation();
+      const cur = zoomRef.current;
+      const delta = -e.deltaY;
+      const factor = delta > 0 ? 1.08 : 1 / 1.08;
+      const nextScale = clamp(cur.scale * factor, 1, 4);
+      if (nextScale === cur.scale) return;
+      setZoomClamped({ scale: nextScale, x: cur.x, y: cur.y });
+    },
+    [setZoomClamped],
+  );
 
   const frameStyle = hasRatio
     ? {
@@ -182,9 +343,18 @@ function GalleryLightboxContent({
         onClick={(e) => e.stopPropagation()}
       >
         <div
-          className="relative shrink-0 overflow-hidden rounded-lg bg-neutral-900/55 shadow-2xl"
+          ref={frameRef}
+          className={`relative shrink-0 overflow-hidden rounded-lg bg-neutral-900/55 shadow-2xl ${
+            zoom.scale > 1.01 ? "cursor-grab active:cursor-grabbing" : ""
+          }`}
           style={frameStyle}
           aria-busy={!fullLoaded}
+          onDoubleClick={onDoubleClick}
+          onPointerDown={onPointerDown}
+          onPointerMove={onPointerMove}
+          onPointerUp={onPointerUpOrCancel}
+          onPointerCancel={onPointerUpOrCancel}
+          onWheel={onWheel}
         >
           {placeholderSrc && (
             <>
@@ -215,6 +385,12 @@ function GalleryLightboxContent({
                   : "opacity-0"
                 : "opacity-100"
             } transition-opacity duration-300`}
+            style={{
+              transform: `translate3d(${zoom.x}px, ${zoom.y}px, 0) scale(${zoom.scale})`,
+              transformOrigin: "center",
+              touchAction: "none",
+              willChange: "transform",
+            }}
           />
           {!fullLoaded && (
             <div
