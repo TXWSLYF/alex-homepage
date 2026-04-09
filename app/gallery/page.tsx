@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { GalleryWaterfall } from "../components/gallery-waterfall";
+import { MasonryGallery } from "../components/masonry-gallery";
 import type { GalleryManifest } from "@/lib/gallery";
 import manifest from "@/data/gallery.json";
 
@@ -33,7 +33,7 @@ export default function GalleryPage() {
         )}
       </header>
 
-      <GalleryWaterfall items={data.items} />
+      <MasonryGallery items={data.items} />
     </main>
   );
 }
