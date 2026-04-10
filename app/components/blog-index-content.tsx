@@ -23,15 +23,16 @@ export function BlogIndexContent({ posts }: Props) {
         transition={softTransition(reduced)}
       >
         <PageIntro
-          title="Blog"
-          description="Long-form notes—mostly front-end, tooling, and experiments."
+          eyebrow="Blog"
+          title="Posts"
+          description="Building with code, sharing stories from life."
         />
       </motion.div>
 
       {posts.length === 0 ? (
-        <p className="mt-12 text-text-sub">No posts yet.</p>
+        <p className="mt-10 text-text-sub">No posts yet.</p>
       ) : (
-        <ul className="mt-12 flex flex-col gap-4">
+        <ul className="mt-10 flex flex-col gap-4">
           {posts.map((post, i) => (
             <motion.li
               key={post.slug}

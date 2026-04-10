@@ -18,7 +18,7 @@ export default function GalleryPage() {
         <PageIntro
           eyebrow="Gallery"
           title="Photos"
-          description="瀑布流展示；缩略图来自 R2，点击可查看原图（若已上传）。"
+          description="Captured moments from distant travels and quiet daily life."
         />
       </div>
 
