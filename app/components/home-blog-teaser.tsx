@@ -24,11 +24,6 @@ export function HomeBlogTeaser({ posts }: Props) {
           <h2 className="mt-2 text-2xl font-semibold tracking-tight text-text-main">
             Latest posts
           </h2>
-          <p className="mt-1 max-w-2xl text-sm text-text-sub">
-            {posts.length > 0
-              ? "Recent updates—the full list lives on Blog."
-              : "Posts will appear here once published."}
-          </p>
         </div>
         <Link
           href="/blog"

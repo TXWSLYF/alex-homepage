@@ -3,7 +3,6 @@
 import { homeContent, skillBadges } from "@/content/home";
 import { softTransition, staggerDelay } from "@/lib/motion-presets";
 import Image from "next/image";
-import Link from "next/link";
 import { motion, useReducedMotion } from "motion/react";
 
 const SKILL_ROWS: [number, number][] = [
@@ -53,33 +52,11 @@ export function HomeHero() {
         {homeContent.tagline}
       </motion.p>
       <motion.div
-        className="mt-8 flex flex-wrap items-center justify-center gap-3"
-        initial={reduced ? { opacity: 0 } : { opacity: 0, y: 12 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{
-          delay: staggerDelay(reduced, 3),
-          ...softTransition(reduced),
-        }}
-      >
-        <Link
-          href={homeContent.ctaPrimary.href}
-          className="inline-flex h-10 items-center justify-center rounded-full bg-brand px-6 text-sm font-medium text-brand-fg transition-colors hover:opacity-90 active:opacity-80"
-        >
-          {homeContent.ctaPrimary.label}
-        </Link>
-        <Link
-          href={homeContent.ctaSecondary.href}
-          className="inline-flex h-10 items-center justify-center rounded-full border border-border-base bg-background px-6 text-sm font-medium text-text-main transition-colors hover:bg-ui-hover active:bg-ui-active"
-        >
-          {homeContent.ctaSecondary.label}
-        </Link>
-      </motion.div>
-      <motion.div
         className="mt-12 w-full max-w-2xl"
         initial={reduced ? { opacity: 0 } : { opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{
-          delay: staggerDelay(reduced, 4),
+          delay: staggerDelay(reduced, 3),
           ...softTransition(reduced),
         }}
       >

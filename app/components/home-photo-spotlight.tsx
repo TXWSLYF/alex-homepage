@@ -44,10 +44,6 @@ export function HomePhotoSpotlight() {
           <h2 className="mt-2 text-2xl font-semibold tracking-tight text-text-main">
             Featured photos
           </h2>
-          <p className="mt-1 max-w-2xl text-sm text-text-sub">
-            Personal frames from travel and everyday light—highlights below,
-            with the full set in the gallery.
-          </p>
         </div>
         <Link
           href="/gallery"

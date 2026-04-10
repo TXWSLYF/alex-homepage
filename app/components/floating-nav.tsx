@@ -4,7 +4,6 @@ import {
   BookText,
   Home,
   Image as ImageIcon,
-  LayoutGrid,
   Moon,
   Sun,
   UserCircle,
@@ -35,7 +34,6 @@ function useIsDarkHtml() {
 
 const links: { href: string; label: string; Icon: LucideIcon }[] = [
   { href: "/about", label: "About", Icon: UserCircle },
-  { href: "/work", label: "Work", Icon: LayoutGrid },
   { href: "/blog", label: "Blog", Icon: BookText },
   { href: "/gallery", label: "Gallery", Icon: ImageIcon },
 ];

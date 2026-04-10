@@ -18,6 +18,4 @@ export const homeContent = {
   eyebrow: "Portfolio",
   tagline:
     "Full-stack development—from UI to APIs, data to deployment—shipping reliable, polished products end to end.",
-  ctaPrimary: { href: "/work", label: "View work" },
-  ctaSecondary: { href: "/about", label: "About me" },
 } as const;
