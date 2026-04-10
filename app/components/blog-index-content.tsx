@@ -1,5 +1,6 @@
 "use client";
 
+import { PageIntro } from "@/app/components/page-intro";
 import type { BlogListItem } from "@/lib/blog";
 import { softTransition, staggerDelay } from "@/lib/motion-presets";
 import Image from "next/image";
@@ -16,16 +17,15 @@ export function BlogIndexContent({ posts }: Props) {
   return (
     <>
       <motion.div
+        className="flex flex-col items-center"
         initial={reduced ? { opacity: 1, y: 0 } : { opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={softTransition(reduced)}
       >
-        <h1 className="text-3xl font-semibold tracking-tight text-text-main sm:text-4xl">
-          Blog
-        </h1>
-        <p className="mt-3 max-w-2xl text-text-sub">
-          Long-form notes—mostly front-end, tooling, and experiments.
-        </p>
+        <PageIntro
+          title="Blog"
+          description="Long-form notes—mostly front-end, tooling, and experiments."
+        />
       </motion.div>
 
       {posts.length === 0 ? (

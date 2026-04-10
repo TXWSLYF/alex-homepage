@@ -1,5 +1,6 @@
 "use client";
 
+import { pageIntroStyles } from "@/app/components/page-intro";
 import { homeContent, skillBadges } from "@/content/home";
 import { softTransition, staggerDelay } from "@/lib/motion-presets";
 import Image from "next/image";
@@ -16,7 +17,7 @@ export function HomeHero() {
   return (
     <section className="relative mx-auto flex w-full max-w-3xl flex-col items-center px-6 pt-24 pb-16 text-center sm:px-10">
       <motion.p
-        className="text-xs font-medium uppercase tracking-[0.2em] text-text-mute"
+        className={pageIntroStyles.eyebrow}
         initial={reduced ? { opacity: 0 } : { opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{
@@ -27,7 +28,7 @@ export function HomeHero() {
         {homeContent.eyebrow}
       </motion.p>
       <motion.h1
-        className="mt-4 text-4xl font-semibold tracking-tight text-text-main sm:text-5xl"
+        className={`${pageIntroStyles.titleHero} mt-2`}
         initial={reduced ? { opacity: 0 } : { opacity: 0, y: 16 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{
@@ -41,7 +42,7 @@ export function HomeHero() {
         </span>
       </motion.h1>
       <motion.p
-        className="mt-5 max-w-lg text-base leading-relaxed text-text-sub sm:text-lg"
+        className={`${pageIntroStyles.description} mx-auto text-pretty sm:text-lg`}
         initial={reduced ? { opacity: 0 } : { opacity: 0, y: 14 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{
