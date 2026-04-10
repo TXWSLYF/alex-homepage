@@ -1,11 +1,11 @@
 "use client";
 
-import { PageIntro } from "@/app/components/page-intro";
 import type { BlogListItem } from "@/lib/blog";
 import { softTransition, staggerDelay } from "@/lib/motion-presets";
 import Image from "next/image";
 import Link from "next/link";
 import { motion, useReducedMotion } from "motion/react";
+import { PageIntro } from "./page-intro";
 
 type Props = {
   posts: BlogListItem[];
@@ -16,18 +16,11 @@ export function BlogIndexContent({ posts }: Props) {
 
   return (
     <>
-      <motion.div
-        className="flex flex-col items-center"
-        initial={reduced ? { opacity: 1, y: 0 } : { opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={softTransition(reduced)}
-      >
-        <PageIntro
-          eyebrow="Blog"
-          title="Posts"
-          description="Building with code, sharing stories from life."
-        />
-      </motion.div>
+      <PageIntro
+        eyebrow="Blog"
+        title="Posts"
+        description="Building with code, sharing stories from life."
+      />
 
       {posts.length === 0 ? (
         <p className="mt-10 text-text-sub">No posts yet.</p>

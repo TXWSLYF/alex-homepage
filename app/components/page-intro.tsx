@@ -1,51 +1,72 @@
+"use client";
+
 import type { ReactNode } from "react";
+import { softTransition, staggerDelay } from "@/lib/motion-presets";
+import { motion, useReducedMotion } from "motion/react";
 
 /** Shared tokens for motion layouts (e.g. home hero). */
 export const pageIntroStyles = {
   eyebrow: "text-xs font-medium uppercase tracking-[0.2em] text-text-mute",
-  titlePage: "text-3xl font-semibold tracking-tight text-text-main sm:text-4xl",
-  titleHero: "text-4xl font-semibold tracking-tight text-text-main sm:text-5xl",
-  description: "mt-3 max-w-2xl text-base leading-relaxed text-text-sub",
-  meta: "mt-3 text-xs text-text-mute",
+  titlePage:
+    "mt-2 w-full text-3xl font-semibold tracking-tight text-text-main sm:text-4xl",
+  titleHero:
+    "mt-2 text-4xl font-semibold tracking-tight text-text-main sm:text-5xl",
+  description:
+    "mt-3 max-w-2xl text-base leading-relaxed text-text-sub mx-auto text-pretty",
 } as const;
 
-type PageIntroProps = {
-  eyebrow?: string;
+export type PageIntroProps = {
+  eyebrow: string;
   title: ReactNode;
-  description?: ReactNode;
-  align?: "left" | "center";
-  variant?: "page" | "hero";
+  description: ReactNode;
 };
 
-export function PageIntro({
-  eyebrow,
-  title,
-  description,
-  align = "center",
-  variant = "page",
-}: PageIntroProps) {
-  const isCenter = align === "center";
-  const titleClass =
-    variant === "hero" ? pageIntroStyles.titleHero : pageIntroStyles.titlePage;
+export function PageIntro({ eyebrow, title, description }: PageIntroProps) {
+  const reduced = useReducedMotion();
+
+  let step = 0;
+  const eyebrowStep = step++;
+  const titleStep = step++;
+  const descriptionStep = step++;
 
   return (
-    <header
-      className={
-        isCenter ? "flex flex-col items-center text-center" : undefined
-      }
-    >
-      {eyebrow ? <p className={pageIntroStyles.eyebrow}>{eyebrow}</p> : null}
-      <h1
-        className={`${titleClass} ${eyebrow ? "mt-2" : ""} ${isCenter ? "w-full" : ""}`}
+    <header className="flex flex-col items-center text-center">
+      {eyebrow ? (
+        <motion.p
+          className={pageIntroStyles.eyebrow}
+          initial={reduced ? { opacity: 0 } : { opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{
+            delay: staggerDelay(reduced, eyebrowStep),
+            ...softTransition(reduced),
+          }}
+        >
+          {eyebrow}
+        </motion.p>
+      ) : null}
+      <motion.h1
+        className={pageIntroStyles.titlePage}
+        initial={reduced ? { opacity: 0 } : { opacity: 0, y: 16 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{
+          delay: staggerDelay(reduced, titleStep),
+          ...softTransition(reduced),
+        }}
       >
         {title}
-      </h1>
+      </motion.h1>
       {description ? (
-        <p
-          className={`${pageIntroStyles.description} ${isCenter ? "mx-auto text-pretty" : "text-pretty"}`}
+        <motion.p
+          className={pageIntroStyles.description}
+          initial={reduced ? { opacity: 0 } : { opacity: 0, y: 14 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{
+            delay: staggerDelay(reduced, descriptionStep),
+            ...softTransition(reduced),
+          }}
         >
           {description}
-        </p>
+        </motion.p>
       ) : null}
     </header>
   );

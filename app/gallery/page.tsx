@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 import { MasonryGallery } from "../components/masonry-gallery";
-import { PageIntro } from "../components/page-intro";
 import type { GalleryManifest } from "@/lib/gallery";
 import manifest from "@/data/gallery.json";
+import { PageIntro } from "../components/page-intro";
 
 const data = manifest as GalleryManifest;
 
@@ -14,7 +14,7 @@ export const metadata: Metadata = {
 export default function GalleryPage() {
   return (
     <main className="relative z-1 mx-auto w-full max-w-6xl flex-1 px-6 py-24 sm:px-10">
-      <div className="mb-10 flex flex-col items-center">
+      <div className="mb-10">
         <PageIntro
           eyebrow="Gallery"
           title="Photos"

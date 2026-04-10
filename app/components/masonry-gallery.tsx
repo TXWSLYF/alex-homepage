@@ -1,7 +1,9 @@
 "use client";
 
 import type { GalleryItem } from "@/lib/gallery";
+import { softTransition } from "@/lib/motion-presets";
 import { thumbHashBase64ToDataUrl } from "@/lib/thumbhash-dataurl";
+import { motion, useReducedMotion } from "motion/react";
 import { useLayoutEffect, useMemo, useRef, useState } from "react";
 import { GalleryAlbum } from "./gallery-album";
 
@@ -46,9 +48,8 @@ function GalleryThumbTile({
   return (
     <button
       type="button"
-      role="listitem"
       onClick={onOpen}
-      className="group mb-4 w-full break-inside-avoid cursor-zoom-in rounded-2xl border border-border-base/80 bg-muted/40 text-left shadow-[0_12px_40px_-18px_rgba(0,0,0,0.35)] transition hover:border-brand/40 focus:outline-none"
+      className="group w-full cursor-zoom-in rounded-2xl border border-border-base/80 bg-muted/40 text-left shadow-[0_12px_40px_-18px_rgba(0,0,0,0.35)] transition hover:border-brand/40 focus:outline-none"
     >
       <div
         className={`relative w-full overflow-hidden rounded-2xl ${
@@ -100,6 +101,7 @@ function GalleryThumbTile({
 }
 
 export function MasonryGallery({ items }: { items: GalleryItem[] }) {
+  const reduced = useReducedMotion();
   const [open, setOpen] = useState<boolean>(false);
   const [index, setIndex] = useState<number>(0);
 
@@ -109,21 +111,33 @@ export function MasonryGallery({ items }: { items: GalleryItem[] }) {
 
   return (
     <>
-      <div
-        className="columns-1 gap-4 sm:columns-2 lg:columns-3 xl:columns-4"
-        role="list"
+      <motion.div
+        initial={reduced ? { opacity: 1, y: 0 } : { opacity: 0, y: 12 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, margin: "-40px" }}
+        transition={softTransition(reduced)}
       >
-        {items.map((item, index) => (
-          <GalleryThumbTile
-            key={`${item.id}-${item.thumbnailUrl}`}
-            item={item}
-            onOpen={() => {
-              setOpen(true);
-              setIndex(index);
-            }}
-          />
-        ))}
-      </div>
+        <div
+          className="columns-1 gap-4 sm:columns-2 lg:columns-3 xl:columns-4"
+          role="list"
+        >
+          {items.map((item, i) => (
+            <div
+              key={`${item.id}-${item.thumbnailUrl}`}
+              role="listitem"
+              className="mb-4 break-inside-avoid"
+            >
+              <GalleryThumbTile
+                item={item}
+                onOpen={() => {
+                  setOpen(true);
+                  setIndex(i);
+                }}
+              />
+            </div>
+          ))}
+        </div>
+      </motion.div>
 
       <GalleryAlbum
         items={items}

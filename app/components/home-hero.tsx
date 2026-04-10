@@ -28,7 +28,7 @@ export function HomeHero() {
         {homeContent.eyebrow}
       </motion.p>
       <motion.h1
-        className={`${pageIntroStyles.titleHero} mt-2`}
+        className={pageIntroStyles.titleHero}
         initial={reduced ? { opacity: 0 } : { opacity: 0, y: 16 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{
@@ -42,7 +42,7 @@ export function HomeHero() {
         </span>
       </motion.h1>
       <motion.p
-        className={`${pageIntroStyles.description} mx-auto text-pretty sm:text-lg`}
+        className={pageIntroStyles.description}
         initial={reduced ? { opacity: 0 } : { opacity: 0, y: 14 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{
