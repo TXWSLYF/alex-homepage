@@ -15,7 +15,7 @@ export function HomeHero() {
   const reduced = useReducedMotion();
 
   return (
-    <section className="relative mx-auto flex w-full max-w-3xl flex-col items-center px-6 pt-24 pb-16 text-center sm:px-10">
+    <section className="relative mx-auto flex w-full max-w-3xl flex-col items-center px-6 pt-24 pb-10 text-center sm:px-10">
       <motion.p
         className={pageIntroStyles.eyebrow}
         initial={reduced ? { opacity: 0 } : { opacity: 0, y: 10 }}

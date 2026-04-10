@@ -60,7 +60,7 @@ export function FloatingNav() {
       className="pointer-events-none fixed top-4 left-1/2 z-50 flex -translate-x-1/2 justify-center px-4"
       aria-label="Main navigation"
     >
-      <div className="pointer-events-auto flex items-center gap-0.5 rounded-full border border-border-base/35 bg-background/40 px-1.5 py-1 shadow-[0_8px_32px_-8px_rgba(0,0,0,0.1),0_4px_12px_-6px_rgba(0,0,0,0.06)] backdrop-blur-md backdrop-saturate-150 dark:border-white/8 dark:bg-background/25 dark:shadow-[0_8px_32px_-8px_rgba(0,0,0,0.45),0_4px_12px_-6px_rgba(0,0,0,0.32)]">
+      <div className="pointer-events-auto flex items-center gap-0.5 rounded-full border border-border-base bg-background px-1.5 py-1 shadow-sm">
         <Link
           href="/"
           className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full transition-colors ${

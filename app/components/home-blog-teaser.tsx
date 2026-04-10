@@ -15,7 +15,7 @@ export function HomeBlogTeaser({ posts }: Props) {
   const reduced = useReducedMotion();
 
   return (
-    <section className="relative mx-auto w-full max-w-5xl px-6 py-16 sm:px-10">
+    <section className="relative mx-auto w-full max-w-5xl px-6 pt-10 pb-16 sm:px-10">
       <div className="mb-8 flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
         <div>
           <p className="text-xs font-medium uppercase tracking-[0.2em] text-text-mute">
