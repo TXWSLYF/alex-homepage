@@ -61,22 +61,166 @@ type AboutSection = {
 };
 
 const featuredCardStyles =
-  "relative aspect-4/5 w-32 flex-[0_0_auto] cursor-default overflow-hidden rounded-2xl border border-border-base/80 bg-muted shadow-[0_12px_40px_-16px_rgba(0,0,0,0.35)] sm:w-36";
+  "relative aspect-4/5 w-full cursor-default overflow-hidden rounded-2xl border border-border-base/80 bg-muted shadow-[0_12px_40px_-16px_rgba(0,0,0,0.35)]";
 
 const ABOUT_SECTIONS: AboutSection[] = [
   {
-    title: "Anime",
+    title: "Anime I've Watched",
     items: [
+      {
+        title: "Re:ZERO -Starting Life in Another World-",
+        imageUrl:
+          "https://image.tmdb.org/t/p/w185//aRwmcX36r1ZpR5Xq5mmFcpUDQ8J.jpg",
+      },
       {
         title: "K-ON!",
         imageUrl:
           "https://image.tmdb.org/t/p/w185//70hf2538UAf7mzzNgvqTlWq6PDf.jpg",
       },
+      {
+        title: "The Disastrous Life of Saiki K.",
+        imageUrl:
+          "https://image.tmdb.org/t/p/w185//tpym31HVeQgenaubvCxkMF3kFHy.jpg",
+      },
+      {
+        title: "ERASED",
+        imageUrl:
+          "https://image.tmdb.org/t/p/w185//EljUwZJhpuYfVuSfqY8Pt1xxpH.jpg",
+      },
+      {
+        title: "Encouragement of Climb",
+        imageUrl:
+          "https://image.tmdb.org/t/p/w185//qg4YOcTbw9DTMO3Fo1ZZBmadcQh.jpg",
+      },
     ],
   },
-  { title: "Games" },
-  { title: "Music" },
-  { title: "Hiking" },
+  {
+    title: "Games I've Played",
+    items: [
+      {
+        title: "The Legend of Sword and Fairy 4",
+        imageUrl:
+          "https://images.igdb.com/igdb/image/upload/t_cover_big/co469b.jpg",
+      },
+      {
+        title: "Xuan-Yuan Sword: The Scar of Sky",
+        imageUrl:
+          "https://images.igdb.com/igdb/image/upload/t_cover_big/co59l4.jpg",
+      },
+      {
+        title: "Spore",
+        imageUrl:
+          "https://images.igdb.com/igdb/image/upload/t_cover_big/co2ac9.jpg",
+      },
+      {
+        title: "Prototype",
+        imageUrl:
+          "https://images.igdb.com/igdb/image/upload/t_cover_big/co1ql2.jpg",
+      },
+      {
+        title: "Prototype 2",
+        imageUrl:
+          "https://images.igdb.com/igdb/image/upload/t_cover_big/co20jt.jpg",
+      },
+      {
+        title: "Call of Duty 4: Modern Warfare",
+        imageUrl:
+          "https://images.igdb.com/igdb/image/upload/t_cover_big/co2adc.jpg",
+      },
+      {
+        title: "League of Legends",
+        imageUrl:
+          "https://images.igdb.com/igdb/image/upload/t_cover_big/coabh7.jpg",
+      },
+      {
+        title: "Terraria",
+        imageUrl:
+          "https://images.igdb.com/igdb/image/upload/t_cover_big/coaamg.jpg",
+      },
+      {
+        title: "Elden Ring",
+        imageUrl:
+          "https://images.igdb.com/igdb/image/upload/t_cover_big/co4jni.jpg",
+      },
+      {
+        title: "Sekiro: Shadows Die Twice - Game of the Year Edition",
+        imageUrl:
+          "https://images.igdb.com/igdb/image/upload/t_cover_big/co67k9.jpg",
+      },
+      {
+        title: "Slay the Spire",
+        imageUrl:
+          "https://images.igdb.com/igdb/image/upload/t_cover_big/co1iyf.jpg",
+      },
+      {
+        title: "Hollow Knight",
+        imageUrl:
+          "https://images.igdb.com/igdb/image/upload/t_cover_big/co93cr.jpg",
+      },
+      {
+        title: "Monster Sanctuary",
+        imageUrl:
+          "https://images.igdb.com/igdb/image/upload/t_cover_big/co1q3q.jpg",
+      },
+      {
+        title: "Chained Echoes",
+        imageUrl:
+          "https://images.igdb.com/igdb/image/upload/t_cover_big/co544u.jpg",
+      },
+      {
+        title: "The Witcher 3: Wild Hunt",
+        imageUrl:
+          "https://images.igdb.com/igdb/image/upload/t_cover_big/coaarl.jpg",
+      },
+      {
+        title: "Darkest Dungeon",
+        imageUrl:
+          "https://images.igdb.com/igdb/image/upload/t_cover_big/coaaw2.jpg",
+      },
+      {
+        title: "Dead Cells+",
+        imageUrl:
+          "https://images.igdb.com/igdb/image/upload/t_cover_big/coa3hi.jpg",
+      },
+      {
+        title: "Ori and the Will of the Wisps",
+        imageUrl:
+          "https://images.igdb.com/igdb/image/upload/t_cover_big/co2e1l.jpg",
+      },
+      {
+        title: "Valheim",
+        imageUrl:
+          "https://images.igdb.com/igdb/image/upload/t_cover_big/cob24q.jpg",
+      },
+      {
+        title: "The Legend of Zelda: Breath of the Wild",
+        imageUrl:
+          "https://images.igdb.com/igdb/image/upload/t_cover_big/co3p2d.jpg",
+      },
+      {
+        title: "The Legend of Zelda: Tears of the Kingdom",
+        imageUrl:
+          "https://images.igdb.com/igdb/image/upload/t_cover_big/co5vmg.jpg",
+      },
+      {
+        title: "RimWorld",
+        imageUrl:
+          "https://images.igdb.com/igdb/image/upload/t_cover_big/coaaqj.jpg",
+      },
+      {
+        title: "Monster Hunter Rise + Sunbreak",
+        imageUrl:
+          "https://images.igdb.com/igdb/image/upload/t_cover_big/co7i5f.jpg",
+      },
+      {
+        title: "Octopath Traveler II",
+        imageUrl:
+          "https://images.igdb.com/igdb/image/upload/t_cover_big/co7ds7.jpg",
+      },
+    ],
+  },
+  { title: "Singers I Like" },
+  { title: "Mountains I've Climbed" },
 ];
 
 export function AboutContent() {
@@ -221,9 +365,9 @@ export function AboutContent() {
       </section>
 
       <section className="mt-16">
-        <div className="space-y-3">
+        <div className="space-y-10">
           {ABOUT_SECTIONS.map((section, i) => (
-            <div key={section.title} className="space-y-3">
+            <div key={section.title} className="space-y-4">
               <motion.h2
                 className="text-2xl font-semibold tracking-tight text-text-main"
                 initial={reduced ? { opacity: 1, y: 0 } : { opacity: 0, y: 12 }}
@@ -238,7 +382,7 @@ export function AboutContent() {
               </motion.h2>
 
               {section.items && section.items.length > 0 ? (
-                <ul className="isolate flex flex-wrap content-start justify-center gap-3 sm:justify-start sm:gap-4">
+                <ul className="isolate grid grid-cols-[repeat(auto-fill,minmax(8rem,1fr))] content-start gap-3 sm:grid-cols-[repeat(auto-fill,minmax(9rem,1fr))] sm:gap-4">
                   {section.items.map((item) => {
                     const content = (
                       <>
@@ -289,7 +433,10 @@ export function AboutContent() {
                             {content}
                           </a>
                         ) : (
-                          <div className="absolute inset-0" aria-label={item.title}>
+                          <div
+                            className="absolute inset-0"
+                            aria-label={item.title}
+                          >
                             {content}
                           </div>
                         )}
