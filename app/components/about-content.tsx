@@ -60,6 +60,9 @@ type AboutSection = {
   items?: AboutSectionItem[];
 };
 
+const featuredCardStyles =
+  "relative aspect-4/5 w-32 flex-[0_0_auto] cursor-default overflow-hidden rounded-2xl border border-border-base/80 bg-muted shadow-[0_12px_40px_-16px_rgba(0,0,0,0.35)] sm:w-36";
+
 const ABOUT_SECTIONS: AboutSection[] = [
   {
     title: "Anime",
@@ -235,51 +238,64 @@ export function AboutContent() {
               </motion.h2>
 
               {section.items && section.items.length > 0 ? (
-                <ul className="flex flex-wrap gap-3">
-                  {section.items.map((item) => (
-                    <li key={`${section.title}-${item.title}`}>
-                      {item.href ? (
-                        <a
-                          href={item.href}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="group flex items-center gap-3 rounded-2xl border border-border-base bg-background p-3 transition-colors hover:bg-ui-hover active:bg-ui-active"
-                        >
-                          {item.imageUrl ? (
-                            // eslint-disable-next-line @next/next/no-img-element
-                            <img
-                              src={item.imageUrl}
-                              alt={item.title}
-                              width={46}
-                              height={64}
-                              loading="lazy"
-                              className="h-16 w-12 shrink-0 rounded-lg object-cover"
-                            />
-                          ) : null}
-                          <span className="text-sm font-medium text-text-main">
-                            {item.title}
-                          </span>
-                        </a>
-                      ) : (
-                        <div className="flex items-center gap-3 rounded-2xl border border-border-base bg-background p-3">
-                          {item.imageUrl ? (
-                            // eslint-disable-next-line @next/next/no-img-element
-                            <img
-                              src={item.imageUrl}
-                              alt={item.title}
-                              width={46}
-                              height={64}
-                              loading="lazy"
-                              className="h-16 w-12 shrink-0 rounded-lg object-cover"
-                            />
-                          ) : null}
-                          <span className="text-sm font-medium text-text-main">
-                            {item.title}
-                          </span>
+                <ul className="isolate flex flex-wrap content-start justify-center gap-3 sm:justify-start sm:gap-4">
+                  {section.items.map((item) => {
+                    const content = (
+                      <>
+                        {item.imageUrl ? (
+                          // eslint-disable-next-line @next/next/no-img-element
+                          <img
+                            src={item.imageUrl}
+                            alt={item.title}
+                            loading="lazy"
+                            className="pointer-events-none absolute inset-0 h-full w-full select-none object-cover"
+                          />
+                        ) : (
+                          <div className="absolute inset-0 bg-linear-to-br from-muted to-surface-muted" />
+                        )}
+                        <div className="pointer-events-none absolute inset-x-0 bottom-0 p-2">
+                          <div className="inline-flex max-w-full rounded-xl bg-background/70 px-2 py-1 text-xs font-medium text-text-main backdrop-blur">
+                            <span className="truncate">{item.title}</span>
+                          </div>
                         </div>
-                      )}
-                    </li>
-                  ))}
+                      </>
+                    );
+
+                    return (
+                      <motion.li
+                        key={`${section.title}-${item.title}`}
+                        className={featuredCardStyles}
+                        initial={{ opacity: 0, y: 10, scale: 0.98 }}
+                        whileInView={{ opacity: 1, y: 0, scale: 1 }}
+                        viewport={{ once: true, margin: "-40px" }}
+                        transition={{
+                          delay: reduced ? 0 : i * 0.03,
+                          ...softTransition(reduced),
+                        }}
+                        whileHover={
+                          reduced
+                            ? undefined
+                            : { scale: 1.04, transition: { duration: 0.25 } }
+                        }
+                      >
+                        {item.href ? (
+                          <a
+                            href={item.href}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="absolute inset-0"
+                            aria-label={item.title}
+                          >
+                            {content}
+                          </a>
+                        ) : (
+                          <div className="absolute inset-0" aria-label={item.title}>
+                            {content}
+                          </div>
+                        )}
+                      </motion.li>
+                    );
+                  })}
                 </ul>
               ) : null}
             </div>
