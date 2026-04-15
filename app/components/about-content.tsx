@@ -40,8 +40,6 @@ const about = {
     { label: "Japanese", flag: "🇯🇵" },
     { label: "English", flag: "🇺🇸" },
   ],
-  intro:
-    "I build end-to-end products with a focus on clear UI, pragmatic architecture, and delightful details.",
   links: [
     { label: "GitHub", href: "https://github.com/TXWSLYF", variant: "github" },
     { label: "Email", href: "mailto:19960623lyf@gmail.com", Icon: Mail },
@@ -67,6 +65,9 @@ const about = {
     },
   ],
 } as const;
+
+const PROTOTYPE_WIKI_URL =
+  "https://en.wikipedia.org/wiki/Prototype_(video_game)";
 
 export function AboutContent() {
   const reduced = useReducedMotion();
@@ -153,7 +154,7 @@ export function AboutContent() {
           </div>
         </motion.div>
 
-        <motion.p
+        <motion.div
           className="mt-6 max-w-2xl text-base leading-relaxed text-text-sub text-pretty"
           initial={reduced ? { opacity: 0 } : { opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
@@ -162,8 +163,24 @@ export function AboutContent() {
             ...softTransition(reduced),
           }}
         >
-          {about.intro}
-        </motion.p>
+          <p>
+            Hi, I’m Alex. I’m currently a full-stack engineer based in Tokyo,
+            primarily using TypeScript-based stack. Outside of work, I enjoy
+            games, anime, music, hiking, and photography.
+          </p>
+          <p>
+            The name “Alex” comes from the video game{" "}
+            <a
+              href={PROTOTYPE_WIKI_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-baseline font-medium text-brand underline decoration-brand/40 underline-offset-4 transition-colors hover:decoration-brand focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/40 focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+            >
+              Prototype
+            </a>
+            , whose protagonist is named Alex Mercer.
+          </p>
+        </motion.div>
 
         <motion.div
           className="mt-8 flex flex-wrap items-center justify-center gap-2"
