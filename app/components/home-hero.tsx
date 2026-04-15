@@ -7,8 +7,8 @@ import Image from "next/image";
 import { motion, useReducedMotion } from "motion/react";
 
 const SKILL_ROWS: [number, number][] = [
-  [0, 4],
-  [4, 8],
+  [0, 5],
+  [5, 9],
 ];
 
 export function HomeHero() {

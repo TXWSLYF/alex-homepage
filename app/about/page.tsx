@@ -1,10 +1,15 @@
-import { PlaceholderShell } from "../components/placeholder-shell";
+import type { Metadata } from "next";
+import { AboutContent } from "../components/about-content";
+
+export const metadata: Metadata = {
+  title: "About — Alex",
+  description: "About me ",
+};
 
 export default function AboutPage() {
   return (
-    <PlaceholderShell
-      title="About"
-      description="About page placeholder—add your bio, timeline, and links."
-    />
+    <main className="relative z-1 mx-auto w-full max-w-3xl flex-1 px-6 py-24 sm:px-10">
+      <AboutContent />
+    </main>
   );
 }

@@ -6,6 +6,7 @@ export const skillBadges = [
   { alt: "React", src: "/badges/react.svg" },
   { alt: "Tailwind CSS", src: "/badges/tailwind.svg" },
   { alt: "Node.js", src: "/badges/nodejs.svg" },
+  { alt: "Docker", src: "/badges/docker.svg" },
   { alt: "NestJS", src: "/badges/nestjs.svg" },
   { alt: "PostgreSQL", src: "/badges/postgresql.svg" },
   { alt: "MySQL", src: "/badges/mysql.svg" },
