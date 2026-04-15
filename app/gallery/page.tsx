@@ -13,7 +13,7 @@ export const metadata: Metadata = {
 
 export default function GalleryPage() {
   return (
-    <main className="relative z-1 mx-auto w-full max-w-6xl flex-1 px-6 py-24 sm:px-10">
+    <main className="relative z-1 mx-auto w-full max-w-5xl flex-1 px-6 py-24 sm:px-10">
       <div className="mb-10">
         <PageIntro
           eyebrow="Gallery"

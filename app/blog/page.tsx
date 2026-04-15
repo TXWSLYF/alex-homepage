@@ -13,7 +13,7 @@ export default function BlogPage() {
   const posts = getAllPosts();
 
   return (
-    <main className="mx-auto max-w-3xl flex-1 px-6 py-24 sm:px-10">
+    <main className="mx-auto w-full max-w-5xl flex-1 px-6 py-24 sm:px-10">
       <BlogIndexContent posts={posts} />
     </main>
   );
