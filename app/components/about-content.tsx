@@ -44,30 +44,37 @@ const about = {
     { label: "GitHub", href: "https://github.com/TXWSLYF", variant: "github" },
     { label: "Email", href: "mailto:19960623lyf@gmail.com", Icon: Mail },
   ] satisfies AboutLink[],
-  experience: [
-    {
-      company: "FLY",
-      role: "Senior Design Engineer",
-      range: "2022 — Present",
-      highlights: [
-        "Redesigned key flows, improving engagement and perceived performance.",
-        "Introduced lightweight AI tooling to speed up iteration loops.",
-      ],
-    },
-    {
-      company: "Creativ3",
-      role: "Lead Designer",
-      range: "2018 — 2022",
-      highlights: [
-        "Built a design system for consistent cross-platform UI.",
-        "Led cross-functional delivery across product, engineering, and marketing.",
-      ],
-    },
-  ],
 } as const;
 
 const PROTOTYPE_WIKI_URL =
   "https://en.wikipedia.org/wiki/Prototype_(video_game)";
+
+type AboutSectionItem = {
+  title: string;
+  imageUrl?: string;
+  href?: string;
+};
+
+type AboutSection = {
+  title: string;
+  items?: AboutSectionItem[];
+};
+
+const ABOUT_SECTIONS: AboutSection[] = [
+  {
+    title: "Anime",
+    items: [
+      {
+        title: "K-ON!",
+        imageUrl:
+          "https://image.tmdb.org/t/p/w185//70hf2538UAf7mzzNgvqTlWq6PDf.jpg",
+      },
+    ],
+  },
+  { title: "Games" },
+  { title: "Music" },
+  { title: "Hiking" },
+];
 
 export function AboutContent() {
   const reduced = useReducedMotion();
@@ -211,44 +218,71 @@ export function AboutContent() {
       </section>
 
       <section className="mt-16">
-        <motion.h2
-          className="text-2xl font-semibold tracking-tight text-text-main"
-          initial={reduced ? { opacity: 1, y: 0 } : { opacity: 0, y: 10 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: "-40px" }}
-          transition={softTransition(reduced)}
-        >
-          Work Experience
-        </motion.h2>
+        <div className="space-y-3">
+          {ABOUT_SECTIONS.map((section, i) => (
+            <div key={section.title} className="space-y-3">
+              <motion.h2
+                className="text-2xl font-semibold tracking-tight text-text-main"
+                initial={reduced ? { opacity: 1, y: 0 } : { opacity: 0, y: 12 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: "-40px" }}
+                transition={{
+                  delay: reduced ? 0 : i * 0.04,
+                  ...softTransition(reduced),
+                }}
+              >
+                {section.title}
+              </motion.h2>
 
-        <div className="mt-8 space-y-8">
-          {about.experience.map((item, i) => (
-            <motion.article
-              key={`${item.company}-${item.range}`}
-              className="rounded-3xl border border-border-base bg-background p-6"
-              initial={reduced ? { opacity: 1, y: 0 } : { opacity: 0, y: 12 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-40px" }}
-              transition={{
-                delay: reduced ? 0 : i * 0.04,
-                ...softTransition(reduced),
-              }}
-            >
-              <div className="flex flex-col gap-2 sm:flex-row sm:items-baseline sm:justify-between">
-                <div>
-                  <p className="text-sm font-semibold tracking-tight text-text-main">
-                    {item.company}
-                  </p>
-                  <p className="mt-1 text-sm text-text-sub">{item.role}</p>
-                </div>
-                <p className="text-sm text-text-mute">{item.range}</p>
-              </div>
-              <ul className="mt-4 list-disc space-y-2 pl-5 text-sm leading-relaxed text-text-sub">
-                {item.highlights.map((h) => (
-                  <li key={h}>{h}</li>
-                ))}
-              </ul>
-            </motion.article>
+              {section.items && section.items.length > 0 ? (
+                <ul className="flex flex-wrap gap-3">
+                  {section.items.map((item) => (
+                    <li key={`${section.title}-${item.title}`}>
+                      {item.href ? (
+                        <a
+                          href={item.href}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="group flex items-center gap-3 rounded-2xl border border-border-base bg-background p-3 transition-colors hover:bg-ui-hover active:bg-ui-active"
+                        >
+                          {item.imageUrl ? (
+                            // eslint-disable-next-line @next/next/no-img-element
+                            <img
+                              src={item.imageUrl}
+                              alt={item.title}
+                              width={46}
+                              height={64}
+                              loading="lazy"
+                              className="h-16 w-12 shrink-0 rounded-lg object-cover"
+                            />
+                          ) : null}
+                          <span className="text-sm font-medium text-text-main">
+                            {item.title}
+                          </span>
+                        </a>
+                      ) : (
+                        <div className="flex items-center gap-3 rounded-2xl border border-border-base bg-background p-3">
+                          {item.imageUrl ? (
+                            // eslint-disable-next-line @next/next/no-img-element
+                            <img
+                              src={item.imageUrl}
+                              alt={item.title}
+                              width={46}
+                              height={64}
+                              loading="lazy"
+                              className="h-16 w-12 shrink-0 rounded-lg object-cover"
+                            />
+                          ) : null}
+                          <span className="text-sm font-medium text-text-main">
+                            {item.title}
+                          </span>
+                        </div>
+                      )}
+                    </li>
+                  ))}
+                </ul>
+              ) : null}
+            </div>
           ))}
         </div>
       </section>
