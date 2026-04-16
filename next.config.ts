@@ -15,6 +15,21 @@ const nextConfig: NextConfig = {
         hostname: "pub-98482c38eca64dbe97c319bbed26cad3.r2.dev",
         pathname: "/gallery/**",
       },
+      {
+        protocol: "https",
+        hostname: "image.tmdb.org",
+        pathname: "/t/p/**",
+      },
+      {
+        protocol: "https",
+        hostname: "images.igdb.com",
+        pathname: "/igdb/image/upload/**",
+      },
+      {
+        protocol: "https",
+        hostname: "lastfm.freetls.fastly.net",
+        pathname: "/i/u/**",
+      },
     ],
   },
 };

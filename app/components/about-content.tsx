@@ -108,6 +108,11 @@ const ABOUT_SECTIONS: AboutSection[] = [
           "https://images.igdb.com/igdb/image/upload/t_cover_big/co59l4.jpg",
       },
       {
+        title: "Xuan-Yuan Sword: The Han Clouds",
+        imageUrl:
+          "https://images.igdb.com/igdb/image/upload/t_cover_big/co2le6.jpg",
+      },
+      {
         title: "Spore",
         imageUrl:
           "https://images.igdb.com/igdb/image/upload/t_cover_big/co2ac9.jpg",
@@ -153,9 +158,19 @@ const ABOUT_SECTIONS: AboutSection[] = [
           "https://images.igdb.com/igdb/image/upload/t_cover_big/co1iyf.jpg",
       },
       {
+        title: "Slay the Spire II",
+        imageUrl:
+          "https://images.igdb.com/igdb/image/upload/t_cover_big/co82c5.jpg",
+      },
+      {
         title: "Hollow Knight",
         imageUrl:
           "https://images.igdb.com/igdb/image/upload/t_cover_big/co93cr.jpg",
+      },
+      {
+        title: "Ori and the Will of the Wisps",
+        imageUrl:
+          "https://images.igdb.com/igdb/image/upload/t_cover_big/co2e1l.jpg",
       },
       {
         title: "Monster Sanctuary",
@@ -168,11 +183,6 @@ const ABOUT_SECTIONS: AboutSection[] = [
           "https://images.igdb.com/igdb/image/upload/t_cover_big/co544u.jpg",
       },
       {
-        title: "The Witcher 3: Wild Hunt",
-        imageUrl:
-          "https://images.igdb.com/igdb/image/upload/t_cover_big/coaarl.jpg",
-      },
-      {
         title: "Darkest Dungeon",
         imageUrl:
           "https://images.igdb.com/igdb/image/upload/t_cover_big/coaaw2.jpg",
@@ -181,11 +191,6 @@ const ABOUT_SECTIONS: AboutSection[] = [
         title: "Dead Cells+",
         imageUrl:
           "https://images.igdb.com/igdb/image/upload/t_cover_big/coa3hi.jpg",
-      },
-      {
-        title: "Ori and the Will of the Wisps",
-        imageUrl:
-          "https://images.igdb.com/igdb/image/upload/t_cover_big/co2e1l.jpg",
       },
       {
         title: "Valheim",
@@ -213,13 +218,77 @@ const ABOUT_SECTIONS: AboutSection[] = [
           "https://images.igdb.com/igdb/image/upload/t_cover_big/co7i5f.jpg",
       },
       {
+        title: "Monster Hunter Stories",
+        imageUrl:
+          "https://images.igdb.com/igdb/image/upload/t_cover_big/cob1tv.jpg",
+      },
+      {
+        title: "Genshin Impact: An Everlasting Dream Intertwined",
+        imageUrl:
+          "https://images.igdb.com/igdb/image/upload/t_cover_big/co88y1.jpg",
+      },
+      {
         title: "Octopath Traveler II",
         imageUrl:
           "https://images.igdb.com/igdb/image/upload/t_cover_big/co7ds7.jpg",
       },
     ],
   },
-  { title: "Singers I Like" },
+  {
+    title: "Music I Like",
+    items: [
+      {
+        title: "ZUTOMAYO - Hisohiso Banashi",
+        imageUrl:
+          "https://lastfm.freetls.fastly.net/i/u/300x300/cdda9b25ccbd9d3be94412ca166dba1c.png",
+      },
+      {
+        title: "ZUTOMAYO - Gusare",
+        imageUrl:
+          "https://lastfm.freetls.fastly.net/i/u/300x300/81bd0a988f1d523d9788d3cd060f98a4.png",
+      },
+      {
+        title: "ZUTOMAYO - Jinkougaku",
+        imageUrl:
+          "https://lastfm.freetls.fastly.net/i/u/300x300/a7c863b124de4c53b89b6615ceb1315c.png",
+      },
+      {
+        title: "ZUTOMAYO - Keisoudo",
+        imageUrl:
+          "https://lastfm.freetls.fastly.net/i/u/300x300/1299f402714be8f6295af9ea71f4de1e.png",
+      },
+      {
+        title: "明透 - ASU",
+        imageUrl:
+          "https://lastfm.freetls.fastly.net/i/u/300x300/e25164f29711680f228ce1ed3a7523aa.png",
+      },
+      {
+        title: "Asu - Ray of Hope",
+        imageUrl:
+          "https://lastfm.freetls.fastly.net/i/u/300x300/c5376dc666cab1f89b39e78f4e437d61.png",
+      },
+      {
+        title: "BEMA - Symbiotic Dominion",
+        imageUrl:
+          "https://lastfm.freetls.fastly.net/i/u/300x300/cc92c0d421354cb5829863a5500f1b2c.png",
+      },
+      {
+        title: "Harusaruhi - SHINJU",
+        imageUrl:
+          "https://lastfm.freetls.fastly.net/i/u/300x300/cc76f5cc816ef25f462cc6bba47a8a6a.png",
+      },
+      {
+        title: "Isekaijoucho - 色彩",
+        imageUrl:
+          "https://lastfm.freetls.fastly.net/i/u/300x300/5ee16098ce7669f77d5eecf39f5546d2.png",
+      },
+      {
+        title: "Albemuth - ADAM",
+        imageUrl:
+          "https://lastfm.freetls.fastly.net/i/u/300x300/0ae2561bc00f53d692eaa14cf9564e2f.png",
+      },
+    ],
+  },
   { title: "Mountains I've Climbed" },
 ];
 
@@ -398,8 +467,12 @@ export function AboutContent() {
                           <div className="absolute inset-0 bg-linear-to-br from-muted to-surface-muted" />
                         )}
                         <div className="pointer-events-none absolute inset-x-0 bottom-0 p-2">
-                          <div className="inline-flex max-w-full rounded-xl bg-background/70 px-2 py-1 text-xs font-medium text-text-main backdrop-blur">
-                            <span className="truncate">{item.title}</span>
+                          <div className="flex w-full justify-center">
+                            <div className="inline-flex max-w-full rounded-xl bg-background/70 px-2 py-1 text-center text-xs font-medium text-text-main backdrop-blur">
+                              <span className="truncate text-center">
+                                {item.title}
+                              </span>
+                            </div>
                           </div>
                         </div>
                       </>
