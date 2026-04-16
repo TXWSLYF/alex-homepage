@@ -118,14 +118,14 @@ export function MasonryGallery({ items }: { items: GalleryItem[] }) {
         transition={softTransition(reduced)}
       >
         <div
-          className="columns-1 gap-4 sm:columns-2 lg:columns-3 xl:columns-4"
+          className="columns-2 gap-x-2 gap-y-2 sm:columns-2 sm:gap-x-4 sm:gap-y-4 lg:columns-3"
           role="list"
         >
           {items.map((item, i) => (
             <div
               key={`${item.id}-${item.thumbnailUrl}`}
               role="listitem"
-              className="mb-4 break-inside-avoid"
+              className="mb-2 break-inside-avoid"
             >
               <GalleryThumbTile
                 item={item}

@@ -5,14 +5,53 @@ import { homeContent, skillBadges } from "@/content/home";
 import { softTransition, staggerDelay } from "@/lib/motion-presets";
 import Image from "next/image";
 import { motion, useReducedMotion } from "motion/react";
+import { useLayoutEffect, useMemo, useState } from "react";
 
-const SKILL_ROWS: [number, number][] = [
-  [0, 5],
-  [5, 9],
-];
+function columnsForWidth(width: number): number {
+  // Keep in sync with Tailwind-ish breakpoints used on the site.
+  if (width >= 1024) return 5;
+  if (width >= 640) return 4;
+  return 3;
+}
+
+function buildSkillRows(total: number, perRow: number): [number, number][] {
+  const safePerRow = Math.max(1, perRow);
+  const rows: [number, number][] = [];
+  for (let start = 0; start < total; start += safePerRow) {
+    rows.push([start, Math.min(total, start + safePerRow)]);
+  }
+  return rows;
+}
 
 export function HomeHero() {
   const reduced = useReducedMotion();
+  const [columnsPerRow, setColumnsPerRow] = useState(3);
+
+  useLayoutEffect(() => {
+    const mqSm = window.matchMedia("(min-width: 640px)");
+    const mqLg = window.matchMedia("(min-width: 1024px)");
+
+    const sync = () => {
+      setColumnsPerRow(columnsForWidth(window.innerWidth));
+    };
+
+    sync();
+
+    // `change` fires when a media query's boolean evaluation flips (i.e. crossing a breakpoint).
+    // That's exactly when `columnsForWidth(window.innerWidth)` can change for threshold-based layouts.
+    mqSm.addEventListener("change", sync);
+    mqLg.addEventListener("change", sync);
+
+    return () => {
+      mqSm.removeEventListener("change", sync);
+      mqLg.removeEventListener("change", sync);
+    };
+  }, []);
+
+  const skillRows = useMemo(
+    () => buildSkillRows(skillBadges.length, columnsPerRow),
+    [columnsPerRow],
+  );
 
   return (
     <section className="relative mx-auto flex w-full max-w-3xl flex-col items-center px-6 pt-24 pb-10 text-center sm:px-10">
@@ -62,7 +101,7 @@ export function HomeHero() {
         }}
       >
         <div className="mx-auto flex w-full max-w-2xl flex-col items-center gap-2">
-          {SKILL_ROWS.map(([from, to]) => (
+          {skillRows.map(([from, to]) => (
             <ul key={from} className="flex flex-wrap justify-center gap-2">
               {skillBadges.slice(from, to).map((badge) => (
                 <li key={badge.alt} className="leading-none">
