@@ -2,7 +2,6 @@
 
 import type { BlogListItem } from "@/lib/blog";
 import { softTransition, staggerDelay } from "@/lib/motion-presets";
-import Image from "next/image";
 import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
 import { motion, useReducedMotion } from "motion/react";
@@ -58,38 +57,26 @@ export function HomeBlogTeaser({ posts }: Props) {
                 href={`/blog/${post.slug}`}
                 className="group flex h-full flex-col overflow-hidden rounded-2xl border border-border-base bg-background transition-colors hover:bg-ui-hover active:bg-ui-active"
               >
-                {post.coverImage ? (
-                  <div className="relative aspect-video w-full border-b border-border-base bg-surface-muted">
-                    <Image
-                      src={post.coverImage}
-                      alt=""
-                      fill
-                      sizes="(max-width: 768px) 100vw, 50vw"
-                      className="object-cover"
-                      priority={i === 0}
-                    />
-                  </div>
-                ) : null}
                 <div className="flex h-full flex-col p-5">
-                <time
-                  dateTime={post.date}
-                  className="text-xs font-medium text-text-mute"
-                >
-                  {post.date}
-                </time>
-                <h3 className="mt-3 text-lg font-semibold text-text-main group-hover:text-brand">
-                  {post.title}
-                </h3>
-                <p className="mt-2 flex-1 text-sm leading-relaxed text-text-sub">
-                  {post.excerpt}
-                </p>
-                <span className="mt-4 inline-flex items-center gap-1 text-sm font-medium text-brand">
-                  Read
-                  <ArrowUpRight
-                    className="h-4 w-4 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
-                    aria-hidden
-                  />
-                </span>
+                  <time
+                    dateTime={post.date}
+                    className="text-xs font-medium text-text-mute"
+                  >
+                    {post.date}
+                  </time>
+                  <h3 className="mt-3 text-lg font-semibold text-text-main group-hover:text-brand">
+                    {post.title}
+                  </h3>
+                  <p className="mt-2 flex-1 text-sm leading-relaxed text-text-sub">
+                    {post.excerpt}
+                  </p>
+                  <span className="mt-4 inline-flex items-center gap-1 text-sm font-medium text-brand">
+                    Read
+                    <ArrowUpRight
+                      className="h-4 w-4 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
+                      aria-hidden
+                    />
+                  </span>
                 </div>
               </Link>
             </motion.article>
