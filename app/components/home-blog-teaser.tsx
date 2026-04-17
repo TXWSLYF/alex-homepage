@@ -1,10 +1,16 @@
 "use client";
 
 import type { BlogListItem } from "@/lib/blog";
-import { softTransition, staggerDelay } from "@/lib/motion-presets";
+import {
+  homeSectionFadeUpItem,
+  homeSectionInnerStagger,
+  homeSectionStaggerContainer,
+  homeSectionViewport,
+} from "@/lib/motion-presets";
 import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
 import { motion, useReducedMotion } from "motion/react";
+import { useMemo } from "react";
 
 type Props = {
   posts: BlogListItem[];
@@ -12,10 +18,28 @@ type Props = {
 
 export function HomeBlogTeaser({ posts }: Props) {
   const reduced = useReducedMotion();
+  const container = useMemo(
+    () => homeSectionStaggerContainer(reduced),
+    [reduced],
+  );
+  const item = useMemo(() => homeSectionFadeUpItem(reduced), [reduced]);
+  const gridStagger = useMemo(
+    () => homeSectionInnerStagger(reduced, 0.1, 0.03),
+    [reduced],
+  );
 
   return (
-    <section className="relative mx-auto w-full max-w-5xl px-6 pt-10 pb-16 sm:px-10">
-      <div className="mb-8 flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
+    <motion.section
+      className="relative mx-auto flex w-full max-w-5xl flex-col gap-8 px-6 pt-10 pb-16 sm:px-10"
+      variants={container}
+      initial="hidden"
+      whileInView="visible"
+      viewport={homeSectionViewport}
+    >
+      <motion.div
+        variants={item}
+        className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between"
+      >
         <div>
           <p className="text-xs font-medium uppercase tracking-[0.2em] text-text-mute">
             Blog
@@ -31,31 +55,36 @@ export function HomeBlogTeaser({ posts }: Props) {
           All posts
           <ArrowUpRight className="h-4 w-4" aria-hidden />
         </Link>
-      </div>
+      </motion.div>
       {posts.length === 0 ? (
-        <p className="text-sm text-text-sub">
+        <motion.p variants={item} className="text-sm text-text-sub">
           Nothing here yet—check back soon or visit{" "}
           <Link href="/blog" className="font-medium text-brand hover:underline">
             Blog
           </Link>
           .
-        </p>
+        </motion.p>
       ) : (
-        <div className="grid gap-4 md:grid-cols-2">
-          {posts.map((post, i) => (
+        <motion.div
+          className="grid gap-4 md:grid-cols-2"
+          variants={gridStagger}
+        >
+          {posts.map((post) => (
             <motion.article
               key={post.slug}
-              initial={reduced ? { opacity: 0 } : { opacity: 0, y: 10 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-40px" }}
-              transition={{
-                delay: staggerDelay(reduced, i),
-                ...softTransition(reduced),
-              }}
+              variants={item}
+              whileHover={
+                reduced
+                  ? undefined
+                  : {
+                      y: -4,
+                      transition: { duration: 0.22, ease: [0.22, 1, 0.36, 1] },
+                    }
+              }
             >
               <Link
                 href={`/blog/${post.slug}`}
-                className="group flex h-full flex-col overflow-hidden rounded-2xl border border-border-base bg-background transition-colors hover:bg-ui-hover active:bg-ui-active"
+                className="group flex h-full flex-col overflow-hidden rounded-2xl border border-border-base bg-background shadow-[0_10px_40px_-24px_rgba(0,0,0,0.35)] transition-[box-shadow,background-color] duration-300 hover:bg-ui-hover hover:shadow-[0_18px_50px_-22px_rgba(0,0,0,0.28)] active:bg-ui-active"
               >
                 <div className="flex h-full flex-col p-5">
                   <time
@@ -81,8 +110,8 @@ export function HomeBlogTeaser({ posts }: Props) {
               </Link>
             </motion.article>
           ))}
-        </div>
+        </motion.div>
       )}
-    </section>
+    </motion.section>
   );
 }

@@ -434,7 +434,7 @@ export function AboutContent() {
       </section>
 
       <section className="mt-16">
-        <div className="space-y-10">
+        <div className="space-y-16">
           {ABOUT_SECTIONS.map((section, i) => (
             <div key={section.title} className="space-y-4">
               <motion.h2

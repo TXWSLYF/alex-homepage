@@ -1,13 +1,20 @@
 "use client";
 
-import { softTransition, staggerDelay } from "@/lib/motion-presets";
-import type { GalleryManifest } from "@/lib/gallery";
+import {
+  homeSectionFadeUpItem,
+  homeSectionInnerStagger,
+  homeSectionStaggerContainer,
+  homeSectionViewport,
+  softTransition,
+} from "@/lib/motion-presets";
+import type { GalleryItem, GalleryManifest } from "@/lib/gallery";
 import manifest from "@/data/gallery.json";
 import Image from "next/image";
 import Link from "next/link";
 import { motion, useReducedMotion } from "motion/react";
+import type { Variants } from "motion/react";
 import { ArrowUpRight } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 const data = manifest as GalleryManifest;
 
@@ -23,6 +30,25 @@ function pickRandom<T>(arr: readonly T[], count: number): T[] {
   return copy.slice(0, count);
 }
 
+function spotlightSlotVariants(
+  reduced: boolean | null,
+  index: number,
+): Variants {
+  const tilt = index % 2 === 0 ? -2.5 : 2.5;
+  return {
+    hidden: reduced
+      ? { opacity: 0 }
+      : { opacity: 0, y: 22, scale: 0.94, rotate: tilt },
+    visible: {
+      opacity: 1,
+      y: 0,
+      scale: 1,
+      rotate: reduced ? 0 : tilt,
+      transition: softTransition(reduced),
+    },
+  };
+}
+
 export function HomePhotoSpotlight() {
   const reduced = useReducedMotion();
   const [items, setItems] = useState(() => [] as GalleryManifest["items"]);
@@ -34,9 +60,31 @@ export function HomePhotoSpotlight() {
     queueMicrotask(() => setItems(pickRandom(pickFrom, 4)));
   }, []);
 
+  const container = useMemo(
+    () => homeSectionStaggerContainer(reduced),
+    [reduced],
+  );
+  const item = useMemo(() => homeSectionFadeUpItem(reduced), [reduced]);
+  const listStagger = useMemo(
+    () => homeSectionInnerStagger(reduced, 0.09, 0.04),
+    [reduced],
+  );
+
+  const slots: (GalleryItem | null)[] =
+    items.length > 0 ? [...items] : [null, null, null, null];
+
   return (
-    <section className="relative mx-auto w-full max-w-5xl px-6 pb-24 pt-4 sm:px-10">
-      <div className="mb-8 flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
+    <motion.section
+      className="relative mx-auto flex w-full max-w-5xl flex-col gap-8 px-6 pb-24 pt-4 sm:px-10"
+      variants={container}
+      initial="hidden"
+      whileInView="visible"
+      viewport={homeSectionViewport}
+    >
+      <motion.div
+        variants={item}
+        className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between"
+      >
         <div>
           <p className="text-xs font-medium uppercase tracking-[0.2em] text-text-mute">
             Gallery
@@ -52,38 +100,18 @@ export function HomePhotoSpotlight() {
           View gallery
           <ArrowUpRight className="h-4 w-4" aria-hidden />
         </Link>
-      </div>
+      </motion.div>
 
-      <div className="relative min-h-[220px] sm:min-h-[260px]">
-        <ul
-          className="isolate flex flex-wrap content-start justify-center gap-3 sm:gap-4"
-          aria-label="Featured photos"
-        >
-          {(items.length > 0 ? items : new Array(4).fill(null)).map((photo, i) => (
+      <motion.ul
+        className="relative isolate flex min-h-[220px] flex-wrap content-start justify-center gap-3 sm:min-h-[260px] sm:gap-4"
+        aria-label="Featured photos"
+        variants={listStagger}
+      >
+          {slots.map((photo, i) => (
             <motion.li
-              key={photo?.id ?? `placeholder-${i}`}
+              key={`spotlight-slot-${i}`}
+              variants={spotlightSlotVariants(reduced, i)}
               className="relative aspect-4/5 w-[calc(50%-0.375rem)] max-w-[calc(50%-0.375rem)] flex-[0_0_auto] cursor-default overflow-hidden rounded-2xl border border-border-base/80 bg-muted shadow-[0_12px_40px_-16px_rgba(0,0,0,0.35)] sm:w-[calc(25%-0.75rem)] sm:max-w-[calc(25%-0.75rem)]"
-              initial={
-                reduced
-                  ? { opacity: 0 }
-                  : {
-                      opacity: 0,
-                      y: 18,
-                      scale: 0.96,
-                      rotate: i % 2 === 0 ? -2.5 : 2.5,
-                    }
-              }
-              whileInView={{
-                opacity: 1,
-                y: 0,
-                scale: 1,
-                rotate: reduced ? 0 : i % 2 === 0 ? -2.5 : 2.5,
-              }}
-              viewport={{ once: true, margin: "-40px" }}
-              transition={{
-                delay: staggerDelay(reduced, i),
-                ...softTransition(reduced),
-              }}
               whileHover={
                 reduced
                   ? undefined
@@ -108,8 +136,7 @@ export function HomePhotoSpotlight() {
               )}
             </motion.li>
           ))}
-        </ul>
-      </div>
-    </section>
+      </motion.ul>
+    </motion.section>
   );
 }
