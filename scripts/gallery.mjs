@@ -12,6 +12,8 @@
  *   remove [--dry-run] <文件名或 stem…> 删除本地原图+缩略图、R2 上对应对象，并执行 build-json
  *
  * 环境变量见 .env.gallery.example；可放在 .env.gallery（需自行创建，已 gitignore）。
+ *
+ * build-json 生成清单时照片按缩略图文件名（thumbName）排序，文件名大的在前（降序、numeric）。
  */
 import {
   DeleteObjectCommand,
@@ -482,7 +484,7 @@ async function buildFromR2(client, publicBase) {
     });
   }
   items.sort((a, b) =>
-    a.thumbName.localeCompare(b.thumbName, undefined, {
+    b.thumbName.localeCompare(a.thumbName, undefined, {
       numeric: true,
       sensitivity: "base",
     }),
@@ -521,7 +523,7 @@ async function buildFromLocal(publicBase) {
     });
   }
   items.sort((a, b) =>
-    a.thumbName.localeCompare(b.thumbName, undefined, {
+    b.thumbName.localeCompare(a.thumbName, undefined, {
       numeric: true,
       sensitivity: "base",
     }),
