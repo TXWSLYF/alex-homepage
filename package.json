@@ -9,6 +9,7 @@
     "gallery:push": "node scripts/gallery.mjs push",
     "gallery:thumbs": "node scripts/gallery.mjs generate-thumbs",
     "gallery:build": "node scripts/gallery.mjs build-json",
+    "gallery:rm": "node scripts/gallery.mjs remove",
     "build": "next build",
     "start": "next start",
     "lint": "eslint"

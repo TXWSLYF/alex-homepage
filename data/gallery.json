@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-04-17T14:37:28.432Z",
+  "generatedAt": "2026-04-17T14:45:20.628Z",
   "publicBaseUrl": "https://pub-98482c38eca64dbe97c319bbed26cad3.r2.dev",
   "items": [
     {
@@ -345,15 +345,6 @@
       "thumbHashBase64": "GQgKDYKZeXWAeHiJaJd4d4+S3Aqa"
     },
     {
-      "id": "DSC08805",
-      "thumbName": "DSC08805.webp",
-      "thumbnailUrl": "https://pub-98482c38eca64dbe97c319bbed26cad3.r2.dev/gallery/thumbs/1600w/DSC08805.webp",
-      "originalUrl": "https://pub-98482c38eca64dbe97c319bbed26cad3.r2.dev/gallery/originals/DSC08805.JPG",
-      "thumbWidth": 1600,
-      "thumbHeight": 1066,
-      "thumbHashBase64": "6tYBFYJmj1WKZ3bOE3aoUT+H4YMH"
-    },
-    {
       "id": "DSC08810",
       "thumbName": "DSC08810.webp",
       "thumbnailUrl": "https://pub-98482c38eca64dbe97c319bbed26cad3.r2.dev/gallery/thumbs/1600w/DSC08810.webp",
@@ -370,15 +361,6 @@
       "thumbWidth": 1600,
       "thumbHeight": 1066,
       "thumbHashBase64": "aAcGDYJowJdWh2ayeDiHZTCdBdJa"
-    },
-    {
-      "id": "DSC08848",
-      "thumbName": "DSC08848.webp",
-      "thumbnailUrl": "https://pub-98482c38eca64dbe97c319bbed26cad3.r2.dev/gallery/thumbs/1600w/DSC08848.webp",
-      "originalUrl": "https://pub-98482c38eca64dbe97c319bbed26cad3.r2.dev/gallery/originals/DSC08848.JPG",
-      "thumbWidth": 1600,
-      "thumbHeight": 1067,
-      "thumbHashBase64": "WQgKDYKmMGdRdqdit3mndy9785MW"
     },
     {
       "id": "DSC08859",
@@ -424,15 +406,6 @@
       "thumbWidth": 1600,
       "thumbHeight": 1067,
       "thumbHashBase64": "JwgKDYJEqHqPiZhpl3d3h2SAQwZI"
-    },
-    {
-      "id": "DSC09039",
-      "thumbName": "DSC09039.webp",
-      "thumbnailUrl": "https://pub-98482c38eca64dbe97c319bbed26cad3.r2.dev/gallery/thumbs/1600w/DSC09039.webp",
-      "originalUrl": "https://pub-98482c38eca64dbe97c319bbed26cad3.r2.dev/gallery/originals/DSC09039.JPG",
-      "thumbWidth": 1600,
-      "thumbHeight": 1067,
-      "thumbHashBase64": "MRgKDYT3R5eKh3h+c2eIhwiGcmAo"
     },
     {
       "id": "DSC09043",

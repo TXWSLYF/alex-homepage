@@ -6,13 +6,15 @@
  *   本地: ${GALLERY_PHOTOS_DIR}/originals/ 、 thumbs/1600w/
  *
  * 用法：
- *   node scripts/gallery.mjs pull|push|generate-thumbs|build-json
+ *   node scripts/gallery.mjs pull|push|generate-thumbs|build-json|remove
  *   pull / push 默认跳过已同步文件（本地已有、或 R2 已有且大小一致）；加 --force 全量拉取/上传
  *   generate-thumbs 可加 --force 忽略「缩略图已比原图新」的跳过逻辑
+ *   remove [--dry-run] <文件名或 stem…> 删除本地原图+缩略图、R2 上对应对象，并执行 build-json
  *
  * 环境变量见 .env.gallery.example；可放在 .env.gallery（需自行创建，已 gitignore）。
  */
 import {
+  DeleteObjectCommand,
   GetObjectCommand,
   HeadObjectCommand,
   ListObjectsV2Command,
@@ -25,6 +27,7 @@ import {
   readdir,
   readFile,
   stat,
+  unlink,
   writeFile,
 } from "node:fs/promises";
 import path from "node:path";
@@ -110,6 +113,28 @@ async function listAllKeys(client, prefix) {
       new ListObjectsV2Command({
         Bucket: bucket(),
         Prefix: pref,
+        ContinuationToken,
+      }),
+    );
+    for (const o of out.Contents ?? []) {
+      if (o.Key && !o.Key.endsWith("/")) keys.push(o.Key);
+    }
+    ContinuationToken = out.IsTruncated
+      ? out.NextContinuationToken
+      : undefined;
+  } while (ContinuationToken);
+  return keys;
+}
+
+/** 列出 R2 上指定前缀下的所有对象键（不含“目录”占位）。 */
+async function listR2KeysWithPrefix(client, prefix) {
+  const keys = [];
+  let ContinuationToken = undefined;
+  do {
+    const out = await client.send(
+      new ListObjectsV2Command({
+        Bucket: bucket(),
+        Prefix: prefix,
         ContinuationToken,
       }),
     );
@@ -554,6 +579,117 @@ async function buildJson() {
   await writeManifest(items);
 }
 
+/**
+ * 按「主文件名 stem」删除：本地 originals 中同 stem 的任意扩展名、本地 thumbs/1600w/{stem}.webp，
+ * R2 上 gallery/originals/{stem}.* 与 gallery/thumbs/1600w/{stem}.webp，最后执行 build-json。
+ */
+async function removePhotos() {
+  await loadEnvGallery();
+  const args = process.argv.slice(3);
+  const dry = args.includes("--dry-run");
+  const names = args.filter((a) => a !== "--dry-run");
+  if (names.length === 0) {
+    console.error(
+      "用法: node scripts/gallery.mjs remove [--dry-run] <文件名或 stem…>",
+    );
+    console.error("示例: node scripts/gallery.mjs remove DSC02116.JPG");
+    console.error(
+      "      node scripts/gallery.mjs remove DSC02116 DSC00022.webp",
+    );
+    console.error("npm:   npm run gallery:rm -- DSC02116.JPG");
+    process.exit(1);
+  }
+
+  const stems = [
+    ...new Set(
+      names
+        .map((n) => stem(path.basename(String(n).trim())))
+        .filter((s) => s.length > 0),
+    ),
+  ];
+
+  const client = s3Client();
+
+  for (const st of stems) {
+    console.log(`\n--- ${st} ---`);
+
+    const origDir = localOriginalsDir();
+    const originals = await listLocalBasenames(origDir);
+    const origName = findOriginalName(st, originals);
+    if (origName) {
+      const p = path.join(origDir, origName);
+      if (dry) console.log("[dry-run] 删除本地原图", path.relative(root, p));
+      else {
+        try {
+          await unlink(p);
+          console.log("删除本地原图", path.relative(root, p));
+        } catch (e) {
+          if (e?.code !== "ENOENT") throw e;
+          console.log("（本地原图已不存在）", path.relative(root, p));
+        }
+      }
+    } else {
+      console.log("（无匹配本地原图）");
+    }
+
+    const thumbLocal = path.join(localThumbsDir(), `${st}.webp`);
+    if (dry) {
+      try {
+        await stat(thumbLocal);
+        console.log(
+          "[dry-run] 删除本地缩略图",
+          path.relative(root, thumbLocal),
+        );
+      } catch {
+        console.log("（无本地缩略图）");
+      }
+    } else {
+      try {
+        await unlink(thumbLocal);
+        console.log("删除本地缩略图", path.relative(root, thumbLocal));
+      } catch (e) {
+        if (e?.code !== "ENOENT") throw e;
+        console.log("（无本地缩略图）");
+      }
+    }
+
+    const origPrefix = `${R2_PREFIX_ORIGINALS}/${st}.`;
+    const origKeys = await listR2KeysWithPrefix(client, origPrefix);
+    for (const key of origKeys) {
+      if (dry) console.log("[dry-run] 删除 R2", key);
+      else {
+        await client.send(
+          new DeleteObjectCommand({ Bucket: bucket(), Key: key }),
+        );
+        console.log("删除 R2", key);
+      }
+    }
+    if (origKeys.length === 0) console.log("（R2 无匹配原图）");
+
+    const thumbKey = `${R2_PREFIX_THUMBS}/${st}.webp`;
+    const thumbSize = await r2ObjectSize(client, thumbKey);
+    if (thumbSize !== null) {
+      if (dry) console.log("[dry-run] 删除 R2", thumbKey);
+      else {
+        await client.send(
+          new DeleteObjectCommand({ Bucket: bucket(), Key: thumbKey }),
+        );
+        console.log("删除 R2", thumbKey);
+      }
+    } else {
+      console.log("（R2 无缩略图）");
+    }
+  }
+
+  if (dry) {
+    console.log("\n[dry-run] 未写入 gallery.json");
+    return;
+  }
+
+  await buildJson();
+  console.log("\nremove 完成（已刷新 data/gallery.json）");
+}
+
 const cmd = process.argv[2];
 
 async function main() {
@@ -561,9 +697,10 @@ async function main() {
   else if (cmd === "push") await push();
   else if (cmd === "generate-thumbs") await generateThumbs();
   else if (cmd === "build-json") await buildJson();
+  else if (cmd === "remove" || cmd === "rm") await removePhotos();
   else {
     console.error(
-      "用法: node scripts/gallery.mjs pull | push | generate-thumbs | build-json",
+      "用法: node scripts/gallery.mjs pull | push | generate-thumbs | build-json | remove",
     );
     process.exit(1);
   }
