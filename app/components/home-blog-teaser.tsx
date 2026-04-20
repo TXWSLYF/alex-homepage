@@ -84,7 +84,7 @@ export function HomeBlogTeaser({ posts }: Props) {
             >
               <Link
                 href={`/blog/${post.slug}`}
-                className="group flex h-full flex-col overflow-hidden rounded-2xl border border-border-base bg-background shadow-[0_10px_40px_-24px_rgba(0,0,0,0.35)] transition-[box-shadow,background-color] duration-300 hover:bg-ui-hover hover:shadow-[0_18px_50px_-22px_rgba(0,0,0,0.28)] active:bg-ui-active"
+                className="group flex h-full flex-col overflow-hidden rounded-2xl border border-border-base bg-background transition-[background-color] duration-300 hover:bg-ui-hover active:bg-ui-active"
               >
                 <div className="flex h-full flex-col p-5">
                   <time

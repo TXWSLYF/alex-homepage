@@ -4,6 +4,7 @@
 export const skillBadges = [
   { alt: "Next.js", src: "/badges/nextjs.svg" },
   { alt: "React", src: "/badges/react.svg" },
+  { alt: "TypeScript", src: "/badges/typescript.svg" },
   { alt: "Tailwind CSS", src: "/badges/tailwind.svg" },
   { alt: "Node.js", src: "/badges/nodejs.svg" },
   { alt: "Docker", src: "/badges/docker.svg" },

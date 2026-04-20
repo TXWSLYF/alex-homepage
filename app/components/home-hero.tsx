@@ -11,7 +11,7 @@ function columnsForWidth(width: number): number {
   // Keep in sync with Tailwind-ish breakpoints used on the site.
   if (width >= 1024) return 5;
   if (width >= 640) return 4;
-  return 3;
+  return 4;
 }
 
 function buildSkillRows(total: number, perRow: number): [number, number][] {

@@ -2,7 +2,6 @@ import { BlogMarkdown } from "@/app/components/blog-markdown";
 import { PageEnter } from "@/app/components/page-enter";
 import { getAllSlugs, getPostBySlug } from "@/lib/blog";
 import type { Metadata } from "next";
-import Link from "next/link";
 import { notFound } from "next/navigation";
 
 type Props = { params: Promise<{ slug: string }> };
@@ -43,7 +42,7 @@ export default async function BlogPostPage({ params }: Props) {
   if (!post) notFound();
 
   return (
-    <main className="mx-auto w-full min-w-0 max-w-5xl flex-1 overflow-x-clip px-6 py-24 sm:px-10">
+    <main className="mx-auto w-full min-w-0 max-w-4xl flex-1 overflow-x-clip px-6 py-24 sm:px-10">
       <PageEnter>
         <article className="min-w-0 max-w-full">
           <time className="text-sm text-text-mute" dateTime={post.date}>
