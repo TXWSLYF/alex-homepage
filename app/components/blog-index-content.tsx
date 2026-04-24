@@ -1,7 +1,7 @@
 "use client";
 
 import type { BlogListItem } from "@/lib/blog";
-import { softTransition, staggerDelay } from "@/lib/motion-presets";
+import { softTransition } from "@/lib/motion-presets";
 import Link from "next/link";
 import { motion, useReducedMotion } from "motion/react";
 import { PageIntro } from "./page-intro";
@@ -25,16 +25,13 @@ export function BlogIndexContent({ posts }: Props) {
         <p className="mt-10 text-text-sub">No posts yet.</p>
       ) : (
         <ul className="mt-10 grid grid-cols-1 gap-4 lg:grid-cols-2">
-          {posts.map((post, i) => (
+          {posts.map((post) => (
             <motion.li
               key={post.slug}
-              initial={reduced ? { opacity: 0 } : { opacity: 0, y: 10 }}
+              initial={{ opacity: 0, y: 10 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: "-40px" }}
-              transition={{
-                delay: staggerDelay(reduced, i),
-                ...softTransition(reduced),
-              }}
+              transition={softTransition(reduced)}
             >
               <Link
                 href={`/blog/${post.slug}`}
