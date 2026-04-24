@@ -1,0 +1,26 @@
+---
+description: Enforce zero-based numbering in documentation
+alwaysApply: true
+---
+
+# Zero-Based Documentation Numbering
+
+When writing or editing project documentation, use zero-based numbering for numbered lists and numbered headings.
+
+Preferred format:
+
+```text
+0) First item
+1) Second item
+2) Third item
+```
+
+Use the same convention for numbered headings in docs:
+
+```text
+0) Overview
+1) Setup
+2) Troubleshooting
+```
+
+Avoid one-based numbering such as `1)`, `2)`, `3)` when starting a new sequence in documentation.

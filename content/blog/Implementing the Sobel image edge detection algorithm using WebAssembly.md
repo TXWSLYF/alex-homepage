@@ -318,8 +318,8 @@ You can find the source code for this example [here](https://github.com/TXWSLYF/
 
 ## Reference Links
 
-1. https://developer.mozilla.org/en-US/docs/WebAssembly/C_to_wasm
-2. https://developer.mozilla.org/en-US/docs/WebAssembly/existing_C_to_wasm
-3. https://web.dev/emscripting-a-c-library/
-4. https://github.com/GoogleChrome/samples/tree/gh-pages/webassembly
-5. https://www.cntofu.com/book/150/zh/ch2-c-js/ch2-04-data-exchange.md
+0) https://developer.mozilla.org/en-US/docs/WebAssembly/C_to_wasm
+1) https://developer.mozilla.org/en-US/docs/WebAssembly/existing_C_to_wasm
+2) https://web.dev/emscripting-a-c-library/
+3) https://github.com/GoogleChrome/samples/tree/gh-pages/webassembly
+4) https://www.cntofu.com/book/150/zh/ch2-c-js/ch2-04-data-exchange.md

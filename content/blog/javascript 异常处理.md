@@ -14,15 +14,15 @@ description: javascript 异常处理
 
 javascript 异常包括
 
-1. **同步异常**
-2. **异步异常**
-3. **Promise 异常**
+0) **同步异常**
+1) **异步异常**
+2) **Promise 异常**
 
 本文将分析各个异常的不同表现形式，以及它们在 Node.js 和浏览器环境下的处理方式。
 
 ---
 
-## 1️⃣ 同步异常
+## 0) 同步异常
 
 最基本的异常就是 **同步代码里抛出的错误**：
 
@@ -40,16 +40,16 @@ try {
 
 特点：
 
-1. `throw` 会立即停止当前函数的执行。
-2. 异常会沿调用栈向上传递，直到被 `try/catch` 捕获。
-3. 如果没有捕获，JS 引擎会将其视为未捕获异常（uncaught exception）。
+0) `throw` 会立即停止当前函数的执行。
+1) 异常会沿调用栈向上传递，直到被 `try/catch` 捕获。
+2) 如果没有捕获，JS 引擎会将其视为未捕获异常（uncaught exception）。
 
    - **浏览器**：会在控制台打印错误，但一般不会停止整个 JS 线程。
    - **Node.js**：默认会终止进程（除非注册了 `process.on('uncaughtException')`）。
 
 ---
 
-## 2️⃣ 异步异常 — 回调函数
+## 1) 异步异常 — 回调函数
 
 在 JS 里，最早的异步机制是 **回调**：
 
@@ -81,7 +81,7 @@ try {
 
 ---
 
-## 3️⃣ Promise 异常（ES6+）
+## 2) Promise 异常（ES6+）
 
 Promise 引入了 **链式异常控制**：
 
@@ -95,13 +95,13 @@ new Promise((resolve, reject) => {
 
 特点：
 
-1. **reject 会被下一个 `.catch()` 捕获**。
-2. 如果没有 `.catch()`，Node.js 就会触发 **unhandledRejection**。
-3. `async/await` 本质上就是 **语法糖**，它把 Promise reject 转换成了同步抛异常的风格。
+0) **reject 会被下一个 `.catch()` 捕获**。
+1) 如果没有 `.catch()`，Node.js 就会触发 **unhandledRejection**。
+2) `async/await` 本质上就是 **语法糖**，它把 Promise reject 转换成了同步抛异常的风格。
 
 ---
 
-### 3.1 async/await 和 try/catch
+### 0) async/await 和 try/catch
 
 ```js
 async function foo() {
@@ -131,11 +131,11 @@ async function foo() {
 
 ---
 
-## 4️⃣ Node.js 的异常控制流特点
+## 3) Node.js 的异常控制流特点
 
 Node.js 里有两个关键事件：
 
-1. **同步未捕获异常**：
+0) **同步未捕获异常**：
 
    ```js
    process.on("uncaughtException", err => {
@@ -143,7 +143,7 @@ Node.js 里有两个关键事件：
    });
    ```
 
-2. **Promise 未处理异常**：
+1) **Promise 未处理异常**：
 
    ```js
    process.on("unhandledRejection", (reason, promise) => {
@@ -160,7 +160,7 @@ Node.js 里有两个关键事件：
 
 ---
 
-## 5️⃣ 异常控制流的传递规则
+## 4) 异常控制流的传递规则
 
 可以总结成一张逻辑表：
 
@@ -175,9 +175,9 @@ Node.js 里有两个关键事件：
 
 ## 🔑 核心结论
 
-1. **同步异常** → try/catch 捕获。
-2. **异步异常（Promise reject）** → 必须用 `.catch()` 或 `await + try/catch`。
-3. **未处理异常** → Node.js 会终止进程，浏览器只报错。
+0) **同步异常** → try/catch 捕获。
+1) **异步异常（Promise reject）** → 必须用 `.catch()` 或 `await + try/catch`。
+2) **未处理异常** → Node.js 会终止进程，浏览器只报错。
 
 ---
 

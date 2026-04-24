@@ -16,7 +16,7 @@ When we want to deploy a service, we often have many secrets such as database co
 
 [git-crypt](https://github.com/AGWA/git-crypt) was created specifically to address this issue. It provides a mechanism for encrypting files, ensuring that we don't have to worry about sensitive information being exposed, even if it's stored in a public Git repository.
 
-## 1.Install
+## 0) Install
 
 For MacOS
 
@@ -34,7 +34,7 @@ make
 make install PREFIX=/usr/local
 ```
 
-## 2.Set up the repository to use git-crypt
+## 1) Set up the repository to use git-crypt
 
 init
 
@@ -49,7 +49,7 @@ export the secret key
 git-crypt export-key /path/to/keyfile
 ```
 
-## 3.Tell git-crypt which files to encrypt
+## 2) Tell git-crypt which files to encrypt
 
 ```bash
 touch .gitattributes
@@ -58,7 +58,7 @@ git add .gitattributes
 git commit -m "Tell git-crypt to encrypt .env"
 ```
 
-## 4.Add a secret
+## 3) Add a secret
 
 now we can create a `.env` file to store sensitive data for our services.
 
@@ -69,7 +69,7 @@ git add .env
 git commit -m "add .env file"
 ```
 
-## 5.Confirm our secret is encrypted
+## 4) Confirm our secret is encrypted
 
 now we run the `cat .env` command we can see
 

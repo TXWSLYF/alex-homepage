@@ -47,7 +47,7 @@ a05e4c4dbd43   none      null      local
 
 ## 二、CASE 分析
 
-### 1. 单独启动容器
+### 0) 单独启动容器
 
 我们可以看到这种情况，容器自动加入了默认的 `bridge` 网络，并且分配了 ip 地址。
 
@@ -262,7 +262,7 @@ curl: (6) Could not resolve host: vigorous_carson
 
 通过上面的例子我们可以看出，**加入 `bridge` 网路的容器之间，能通过 ip 地址相互通信，但是不能通过容器名**。
 
-### 2. 通过 docker-compose 启动容器
+### 1) 通过 docker-compose 启动容器
 
 ```yml
 # docker-compose.yml
@@ -467,7 +467,7 @@ Commercial support is available at
 
 ## 三、常用命令总结
 
-### **1. 查看网络列表**
+### **0) 查看网络列表**
 
 查看本地所有的 Docker 网络。这是最常用的网络命令之一。
 
@@ -475,7 +475,7 @@ Commercial support is available at
 docker network ls
 ```
 
-### **2. 查看网络详情**
+### **1) 查看网络详情**
 
 查看某个网络的具体配置，比如子网、网关、连接的容器等。
 
@@ -489,7 +489,7 @@ docker network inspect <network_name_or_id>
 docker network inspect bridge
 ```
 
-### **3. 创建自定义网络**
+### **2) 创建自定义网络**
 
 创建自定义的桥接网络是最佳实践。它能让容器通过名称互相通信。
 
@@ -503,7 +503,7 @@ docker network create <network_name>
 docker network create my-custom-network
 ```
 
-### **4. 将容器连接到网络**
+### **3) 将容器连接到网络**
 
 启动容器时，使用 `--network` 参数将其连接到指定的网络。
 
@@ -523,7 +523,7 @@ docker run -d --name my-web --network my-custom-network nginx
 docker network connect <network_name> <container_name>
 ```
 
-### **5. 将容器从网络中断开**
+### **4) 将容器从网络中断开**
 
 将一个正在运行的容器从某个网络中断开。
 
@@ -531,7 +531,7 @@ docker network connect <network_name> <container_name>
 docker network disconnect <network_name> <container_name>
 ```
 
-### **6. 删除网络**
+### **5) 删除网络**
 
 删除不再需要的网络。删除前必须确保没有容器连接到该网络。
 
@@ -539,7 +539,7 @@ docker network disconnect <network_name> <container_name>
 docker network rm <network_name_or_id>
 ```
 
-### **7. 清理未使用的网络**
+### **6) 清理未使用的网络**
 
 如果你有很多不再使用的网络（例如，之前创建的但没有被容器使用的），可以使用这个命令一键清理。
 
