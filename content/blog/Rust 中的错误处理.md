@@ -59,6 +59,39 @@ let file = match f {
 * `unwrap()`：如果是 `Err`，直接 `panic`。
 * `expect("自定义错误消息")`：如果是 `Err`，带着你的消息 `panic`。
 
+#### C. 给默认值：`unwrap_or` 和 `unwrap_or_else`
+当你不想 `panic`，而是希望在失败/为空时回退到一个**默认值**，可以用：
+
+- `unwrap_or(default)`：直接给一个默认值（**默认值会被立即求值**）
+- `unwrap_or_else(|| default)`：给一个闭包，只有在需要默认值时才计算（**惰性求值**）
+
+这两个方法在 `Option<T>` 和 `Result<T, E>` 上都能用：
+
+```rust
+// Option<T>
+let port: u16 = std::env::var("PORT")
+    .ok()
+    .and_then(|s| s.parse().ok())
+    .unwrap_or(8080);
+
+let port2: u16 = std::env::var("PORT")
+    .ok()
+    .and_then(|s| s.parse().ok())
+    .unwrap_or_else(|| {
+        // 只有在没有 PORT 时才会执行
+        8080
+    });
+
+// Result<T, E>
+let n: i32 = "123".parse::<i32>().unwrap_or(0);
+let n2: i32 = "123".parse::<i32>().unwrap_or_else(|_err| 0);
+```
+
+一般经验是：
+
+- 默认值很便宜、也不依赖错误信息：优先 `unwrap_or`
+- 默认值计算较贵、或你想基于 `Err` 做日志/分支：用 `unwrap_or_else`
+
 ---
 
 ## 2) 错误传播的艺术：`?` 运算符
