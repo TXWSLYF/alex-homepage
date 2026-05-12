@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import { FloatingNav } from "./components/floating-nav";
 import { THEME_STORAGE_KEY } from "@/lib/theme";
 import "./globals.css";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -56,6 +57,7 @@ export default function RootLayout({
       <body className="relative min-h-full flex flex-col overflow-x-clip font-sans">
         <FloatingNav />
         {children}
+        <SpeedInsights />
       </body>
     </html>
   );
