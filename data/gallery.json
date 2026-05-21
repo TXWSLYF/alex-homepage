@@ -1,7 +1,16 @@
 {
-  "generatedAt": "2026-04-27T15:05:32.661Z",
+  "generatedAt": "2026-05-21T01:23:02.076Z",
   "publicBaseUrl": "https://pub-98482c38eca64dbe97c319bbed26cad3.r2.dev",
   "items": [
+    {
+      "id": "DSC10502",
+      "thumbName": "DSC10502.webp",
+      "thumbnailUrl": "https://pub-98482c38eca64dbe97c319bbed26cad3.r2.dev/gallery/thumbs/1600w/DSC10502.webp",
+      "originalUrl": "https://pub-98482c38eca64dbe97c319bbed26cad3.r2.dev/gallery/originals/DSC10502.JPG",
+      "thumbWidth": 1600,
+      "thumbHeight": 1067,
+      "thumbHashBase64": "oNYJDYIIaHhpiHhhd5h4hpVQMwpF"
+    },
     {
       "id": "DSC10031",
       "thumbName": "DSC10031.webp",

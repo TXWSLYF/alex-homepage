@@ -52,6 +52,13 @@ description: 日常开发里高频用到的 Linux / macOS 终端命令速查，�
 | `docker system prune -a` | 清理未使用数据，**操作前请确认** |
 | `docker compose up -d` | 后台启动编排 |
 
+## 定时任务
+
+| 命令 | 说明 |
+|------|------|
+| `crontab -l` | 列出当前用户的 cron 任务 |
+| `crontab -e` | 编辑当前用户的 cron 任务 |
+
 ## 其他
 
 | 命令 | 说明 |
