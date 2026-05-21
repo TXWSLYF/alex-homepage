@@ -51,6 +51,8 @@ description: 日常开发里高频用到的 Linux / macOS 终端命令速查，�
 | `docker image prune -a` | 清理未使用的镜像 |
 | `docker system prune -a` | 清理未使用数据，**操作前请确认** |
 | `docker compose up -d` | 后台启动编排 |
+| `docker-compose pull [service-name]` | 生产部署第一步：拉取最新远程镜像 |
+| `docker-compose up -d [service-name]` | 生产部署第二步：后台重建并启动该服务 |
 
 ## 定时任务
 
