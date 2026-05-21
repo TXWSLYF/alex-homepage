@@ -3,6 +3,7 @@
 import type { BlogListItem } from "@/lib/blog";
 import { softTransition } from "@/lib/motion-presets";
 import Link from "next/link";
+import { Pin } from "lucide-react";
 import { motion, useReducedMotion } from "motion/react";
 import { PageIntro } from "./page-intro";
 
@@ -37,14 +38,25 @@ export function BlogIndexContent({ posts }: Props) {
                 href={`/blog/${post.slug}`}
                 className="group block overflow-hidden rounded-2xl border border-border-base bg-background transition-colors hover:bg-ui-hover active:bg-ui-active"
               >
-                <div className="p-5">
+                <div className="relative p-5">
+                  {post.pinned ? (
+                    <span
+                      className="absolute right-5 top-5 inline-flex h-6 w-6 items-center justify-center rounded-full border border-brand/20 bg-brand/10 text-brand dark:border-brand/50 dark:bg-brand/30"
+                      aria-label="Pinned"
+                      title="Pinned"
+                    >
+                      <Pin className="h-3.5 w-3.5" aria-hidden />
+                    </span>
+                  ) : null}
                   <time
                     dateTime={post.date}
                     className="text-xs font-medium text-text-mute"
                   >
                     {post.date}
                   </time>
-                  <h2 className="mt-2 text-lg font-semibold text-text-main group-hover:text-brand lg:line-clamp-1">
+                  <h2
+                    className={`mt-2 text-lg font-semibold text-text-main group-hover:text-brand lg:line-clamp-1${post.pinned ? " pr-8" : ""}`}
+                  >
                     {post.title}
                   </h2>
                   {post.excerpt ? (

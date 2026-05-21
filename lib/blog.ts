@@ -9,6 +9,7 @@ export type BlogListItem = {
   title: string;
   date: string;
   excerpt: string;
+  pinned?: boolean;
 };
 
 export type BlogPost = BlogListItem & {
@@ -16,6 +17,7 @@ export type BlogPost = BlogListItem & {
   tags: string[];
   author?: string;
   featured?: boolean;
+  pinOrder?: number;
   ogImage?: string;
 };
 
@@ -70,6 +72,45 @@ function parseTags(data: Record<string, unknown>): string[] {
   return t.filter((x): x is string => typeof x === "string");
 }
 
+function parsePinned(data: Record<string, unknown>): boolean {
+  return data.pinned === true;
+}
+
+function parsePinOrder(data: Record<string, unknown>): number | undefined {
+  const raw = data.pinOrder;
+  if (typeof raw === "number" && Number.isFinite(raw)) return raw;
+  return undefined;
+}
+
+function compareByDateDesc(a: BlogPost, b: BlogPost): number {
+  const da = a.date || "";
+  const db = b.date || "";
+  return db.localeCompare(da);
+}
+
+/** Blog index: pinned first (lower pinOrder first), then by date. */
+function compareForBlogIndex(a: BlogPost, b: BlogPost): number {
+  const aPinned = Boolean(a.pinned);
+  const bPinned = Boolean(b.pinned);
+  if (aPinned !== bPinned) return aPinned ? -1 : 1;
+  if (aPinned && bPinned) {
+    const oa = a.pinOrder ?? Number.MAX_SAFE_INTEGER;
+    const ob = b.pinOrder ?? Number.MAX_SAFE_INTEGER;
+    if (oa !== ob) return oa - ob;
+  }
+  return compareByDateDesc(a, b);
+}
+
+function toListItem(post: BlogPost): BlogListItem {
+  return {
+    slug: post.slug,
+    title: post.title,
+    date: post.date,
+    excerpt: post.excerpt,
+    pinned: post.pinned ? true : undefined,
+  };
+}
+
 function parseMarkdownFile(fileName: string): BlogPost | null {
   if (!fileName.endsWith(".md")) return null;
   const fullPath = path.join(BLOG_DIR, fileName);
@@ -95,6 +136,8 @@ function parseMarkdownFile(fileName: string): BlogPost | null {
     typeof data.author === "string" ? data.author : undefined;
   const featured =
     typeof data.featured === "boolean" ? data.featured : undefined;
+  const pinned = parsePinned(data);
+  const pinOrder = pinned ? parsePinOrder(data) : undefined;
   const ogImage =
     typeof data.ogImage === "string" && data.ogImage.trim() !== ""
       ? data.ogImage
@@ -109,6 +152,8 @@ function parseMarkdownFile(fileName: string): BlogPost | null {
     tags: parseTags(data),
     author,
     featured,
+    pinned: pinned ? true : undefined,
+    pinOrder,
     ogImage,
   };
 }
@@ -121,11 +166,7 @@ function readAllPosts(): BlogPost[] {
     const post = parseMarkdownFile(name);
     if (post) posts.push(post);
   }
-  posts.sort((a, b) => {
-    const da = a.date || "";
-    const db = b.date || "";
-    return db.localeCompare(da);
-  });
+  posts.sort(compareByDateDesc);
   return posts;
 }
 
@@ -139,16 +180,11 @@ function allPublished(): BlogPost[] {
 }
 
 export function getAllPosts(): BlogListItem[] {
-  return allPublished().map((p) => ({
-    slug: p.slug,
-    title: p.title,
-    date: p.date,
-    excerpt: p.excerpt,
-  }));
+  return [...allPublished()].sort(compareForBlogIndex).map(toListItem);
 }
 
 export function getLatestPosts(n: number): BlogListItem[] {
-  return getAllPosts().slice(0, n);
+  return [...allPublished()].sort(compareByDateDesc).slice(0, n).map(toListItem);
 }
 
 export function getAllSlugs(): string[] {

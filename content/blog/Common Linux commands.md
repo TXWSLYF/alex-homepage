@@ -7,6 +7,8 @@ tags:
   - Linux
   - CLI
 featured: false
+pinned: true
+pinOrder: 0
 draft: false
 ogImage: ""
 description: 日常开发里高频用到的 Linux / macOS 终端命令速查，适合收藏备用。

@@ -68,6 +68,8 @@ flowchart LR
 | `tags` | 字符串数组，可展示在文首或后续扩展 |
 | `author` | 可选，文首展示 |
 | `featured` | 可选，预留 |
+| `pinned` | `true` 时在 `/blog` 列表置顶 |
+| `pinOrder` | 可选数字；多篇置顶时越小越靠前 |
 | `ogImage` | 非空时写入 `openGraph.images` |
 | `postSlug` | **非空**时作为 URL slug；**空字符串**时与未设置一样，**由源文件名**（去 `.md`）经 slugify 得到 slug（小写、非字母数字变 `-`） |
 
@@ -89,7 +91,7 @@ flowchart LR
 
 ## 实现要点（代码位置）
 
-- **`lib/blog.ts`**：`getAllPosts`、`getPostBySlug`、`getLatestPosts(n)`；draft 过滤；按日期降序。
+- **`lib/blog.ts`**：`getAllPosts`、`getPostBySlug`、`getLatestPosts(n)`；draft 过滤；列表页置顶优先、其余按日期降序；首页 latest 仍纯按日期。
 - **`app/blog-media/[filename]/route.ts`**：受控读取 `content/blog` 内媒体文件。
 - **`app/blog/[slug]/page.tsx`**：`ReactMarkdown` + 自定义 `img` 将相对路径转为 `/blog-media/...`；`prose` 排版。
 - **首页**：`app/page.tsx` 调用 `getLatestPosts(2)`，将结果以 props 传给 `HomeBlogTeaser`（避免在客户端 `fs`）。
