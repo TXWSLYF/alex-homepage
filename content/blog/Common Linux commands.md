@@ -29,6 +29,7 @@ description: 日常开发里高频用到的 Linux / macOS 终端命令速查，�
 |------|------|
 | `cat file` | 输出整个文件 |
 | `head -n 20 file` | 前 20 行 |
+| `tail -n 20 file` | 后 20 行 |
 | `tail -f file` | 跟踪文件末尾（看日志常用） |
 
 ## 进程与资源
@@ -37,7 +38,7 @@ description: 日常开发里高频用到的 Linux / macOS 终端命令速查，�
 |------|------|
 | `top` / `htop` | 实时资源占用 |
 | `kill -9 PID` | 强制结束进程 |
-| `lsof -i :3000` | 查看端口占用 |
+| `sudo lsof -i :3000` | 查看端口占用 |
 
 ## 网络
 
