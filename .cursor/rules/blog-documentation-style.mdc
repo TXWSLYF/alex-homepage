@@ -1,0 +1,128 @@
+---
+description: Blog and documentation structure, numbering, and layout conventions
+alwaysApply: true
+---
+
+# Blog & Documentation Style
+
+When writing or editing `content/blog/*.md` or project docs under `docs/`, follow the conventions below.
+
+**Reference:** `content/blog/彻底搞懂 React 不可变数据、Memo 与渲染本质.md`
+
+---
+
+## 1 Heading numbering
+
+Use **one-based decimal headings** — number, space, title; no trailing parenthesis.
+
+```text
+## 1 Overview
+### 1.1 First point
+### 1.2 Second point
+## 2 Next topic
+### 2.1 Subtopic
+```
+
+Rules:
+
+- Level 2: `## 1 Title`, `## 2 Title`, …
+- Level 3: `### 1.1 Title`, `### 1.2 Title`, …
+- Subsections inherit the parent section number (`2.1`, `2.2` under `## 2`).
+
+Avoid:
+
+- Zero-based headings: `## 0)`, `### 0.1)`
+- Parenthesis suffix: `## 1)`, `## 2)`
+- Mixing formats in one article (e.g. `0)` headings + `1.1` subheadings)
+
+---
+
+## 2 Body lists (not headings)
+
+For numbered points **inside** a section, use standard Markdown ordered lists:
+
+```text
+1. **First point** — explanation
+2. **Second point** — explanation
+3. **Third point** — explanation
+```
+
+Use em dash `—` or a short clause after the bold label. Do not use `0)` / `1)` / `2)` in running text.
+
+---
+
+## 3 Article structure
+
+**Opening**
+
+- One or two hook questions (pain points or common misconceptions)
+- One line stating the reading path, with the main thread in **bold**
+
+**Sections**
+
+- Separate major sections with `---`
+- Lead each major section with a short paragraph before subsections
+- State conclusions early when helpful: `**结论：…**`
+
+**Cross-references**
+
+- Refer to other sections as `第 3 节`, not `2) 浅比较` or `## 3)`
+
+**Key takeaways**
+
+- Use blockquotes for single core conclusions:
+
+```markdown
+> **核心结论：** …
+```
+
+---
+
+## 4 Tables
+
+Prefer tables for scannable comparisons:
+
+| Use case | Example |
+| :--- | :--- |
+| 现象 / 原因 | Two-row table with **现象** and **原因** |
+| 含义 / 特点 | Attribute rows for concepts (Render vs Commit) |
+| 场景 / 行为 | API or hook comparison |
+| 方案对比 | 方案、推荐度、说明 |
+| 总结 | 关卡、名称、要点 |
+
+Headerless two-column tables are fine when labels live in the first column:
+
+```markdown
+| | |
+| :--- | :--- |
+| **含义** | … |
+| **特点** | … |
+```
+
+---
+
+## 5 Code blocks
+
+- Always tag the language: ` ```javascript `, ` ```rust `, ` ```text `
+- Keep examples minimal but runnable or self-contained
+- Put code before or after a short explanation table when both help
+
+---
+
+## 6 Summary section
+
+End long technical posts with a final numbered section (e.g. `## 6 总结`):
+
+1. Structured recap — usually a table
+2. Short actionable bullets — “日常开发再记两条” style
+
+---
+
+## 7 Scope
+
+Apply these rules to:
+
+- `content/blog/*.md` (required)
+- `docs/*.md` (recommended for new or heavily edited docs)
+
+Older blog posts may use legacy numbering; align them when doing substantial edits.
