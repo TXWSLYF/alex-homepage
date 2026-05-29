@@ -13,21 +13,21 @@ When writing or editing `content/blog/*.md` or project docs under `docs/`, follo
 
 ## 1 Heading numbering
 
-Use **one-based decimal headings** — number, space, title; no trailing parenthesis.
+Use **one-based decimal headings** — number, dot, space, title; no trailing parenthesis.
 
 ```text
-## 1 Overview
+## 1. Overview
 ### 1.1 First point
 ### 1.2 Second point
-## 2 Next topic
+## 2. Next topic
 ### 2.1 Subtopic
 ```
 
 Rules:
 
-- Level 2: `## 1 Title`, `## 2 Title`, …
+- Level 2: `## 1. Title`, `## 2. Title`, …（一级节号后加点号，与 `1.1` 子节区分：前者是 `1.` + 空格，后者是 `1.1` + 空格）
 - Level 3: `### 1.1 Title`, `### 1.2 Title`, …
-- Subsections inherit the parent section number (`2.1`, `2.2` under `## 2`).
+- Subsections inherit the parent section number (`2.1`, `2.2` under `## 2.`).
 
 Avoid:
 
@@ -111,7 +111,7 @@ Headerless two-column tables are fine when labels live in the first column:
 
 ## 6 Summary section
 
-End long technical posts with a final numbered section (e.g. `## 6 总结`):
+End long technical posts with a final numbered section (e.g. `## 6. 总结`):
 
 1. Structured recap — usually a table
 2. Short actionable bullets — “日常开发再记两条” style

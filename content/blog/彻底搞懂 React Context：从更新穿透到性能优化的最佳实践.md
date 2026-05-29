@@ -19,7 +19,7 @@ description: 购物车 Demo 拆解 Context 穿透机制，并给出读写分离�
 
 ---
 
-## 1 演示 Demo
+## 1. 演示 Demo
 
 把下面代码复制到本地（如 Vite + React），打开控制台，对照第 2 节的两种场景观察 `console.log`。
 
@@ -324,7 +324,7 @@ export default function App() {
 
 ---
 
-## 2 现状观察：Demo 中的日志迷局
+## 2. 现状观察：Demo 中的日志迷局
 
 分别触发两种更新，对照第 1 节代码看控制台输出。
 
@@ -360,7 +360,7 @@ ChildUnderContext 渲染
 
 ---
 
-## 3 核心原理：Context 的更新与穿透机制
+## 3. 核心原理：Context 的更新与穿透机制
 
 ### 3.1 为什么 Context 能「穿透」`memo`？
 
@@ -395,7 +395,7 @@ Demo 里 Provider 每次 render 都 new 一个对象：
 
 ---
 
-## 4 Context 性能优化的最佳实践
+## 4. Context 性能优化的最佳实践
 
 ### 4.1 读写分离（State 与 Dispatch 分离）
 
@@ -501,7 +501,7 @@ const Child = memo(function Child() {
 
 ---
 
-## 5 生产环境最佳实践全指南
+## 5. 生产环境最佳实践全指南
 
 结合性能与架构，可归纳为 **7 条法则**。前 4 条偏「怎么写 Provider / 消费者」，后 3 条偏「放哪、怎么防错、何时换方案」。
 
@@ -611,7 +611,7 @@ export function useCart() {
 
 ---
 
-## 6 技术选型：什么时候该用 Context？
+## 6. 技术选型：什么时候该用 Context？
 
 Context 的定位更接近**低频状态广播**，而不是高频状态流转引擎。
 
@@ -625,7 +625,7 @@ Context 的定位更接近**低频状态广播**，而不是高频状态流转�
 
 ---
 
-## 7 总结
+## 7. 总结
 
 ### 7.1 七大法则速查
 
