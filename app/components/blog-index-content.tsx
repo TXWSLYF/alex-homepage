@@ -3,7 +3,7 @@
 import type { BlogListItem } from "@/lib/blog";
 import { softTransition } from "@/lib/motion-presets";
 import Link from "next/link";
-import { Pin } from "lucide-react";
+import { FileText, Pin } from "lucide-react";
 import { motion, useReducedMotion } from "motion/react";
 import { PageIntro } from "./page-intro";
 
@@ -25,46 +25,40 @@ export function BlogIndexContent({ posts }: Props) {
       {posts.length === 0 ? (
         <p className="mt-10 text-text-sub">No posts yet.</p>
       ) : (
-        <ul className="mt-10 grid grid-cols-1 gap-4 lg:grid-cols-2">
+        <ul className="mt-10 flex flex-col">
           {posts.map((post) => (
             <motion.li
               key={post.slug}
-              initial={{ opacity: 0, y: 10 }}
+              initial={{ opacity: 0, y: 6 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: "-40px" }}
               transition={softTransition(reduced)}
             >
               <Link
                 href={`/blog/${post.slug}`}
-                className="group block overflow-hidden rounded-2xl border border-border-base bg-background transition-colors hover:bg-ui-hover active:bg-ui-active"
+                className="group -mx-3 flex items-center gap-3 rounded-lg px-3 py-3 transition-colors hover:bg-ui-hover active:bg-ui-active sm:gap-4"
               >
-                <div className="relative p-5">
+                <span
+                  className="inline-flex h-5 w-5 shrink-0 items-center justify-center text-text-mute transition-colors group-hover:text-brand"
+                  aria-hidden
+                >
                   {post.pinned ? (
-                    <span
-                      className="absolute right-5 top-5 inline-flex h-6 w-6 items-center justify-center rounded-full border border-brand/20 bg-brand/10 text-brand dark:border-brand/50 dark:bg-brand/30"
-                      aria-label="Pinned"
-                      title="Pinned"
-                    >
-                      <Pin className="h-3.5 w-3.5" aria-hidden />
-                    </span>
-                  ) : null}
+                    <Pin className="h-4 w-4" />
+                  ) : (
+                    <FileText className="h-4 w-4" />
+                  )}
+                </span>
+                <h2 className="min-w-0 flex-1 truncate text-[15px] font-medium leading-snug text-text-main transition-colors group-hover:text-brand sm:text-base">
+                  {post.title}
+                </h2>
+                {post.date ? (
                   <time
                     dateTime={post.date}
-                    className="text-xs font-medium text-text-mute"
+                    className="shrink-0 font-mono text-xs text-text-mute sm:text-sm"
                   >
                     {post.date}
                   </time>
-                  <h2
-                    className={`mt-2 text-lg font-semibold text-text-main group-hover:text-brand lg:line-clamp-1${post.pinned ? " pr-8" : ""}`}
-                  >
-                    {post.title}
-                  </h2>
-                  {post.excerpt ? (
-                    <p className="mt-2 text-sm leading-relaxed text-text-sub lg:line-clamp-1">
-                      {post.excerpt}
-                    </p>
-                  ) : null}
-                </div>
+                ) : null}
               </Link>
             </motion.li>
           ))}

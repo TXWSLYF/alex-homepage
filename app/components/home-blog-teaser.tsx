@@ -8,7 +8,7 @@ import {
   homeSectionViewport,
 } from "@/lib/motion-presets";
 import Link from "next/link";
-import { ArrowUpRight } from "lucide-react";
+import { ArrowUpRight, FileText, Pin } from "lucide-react";
 import { motion, useReducedMotion } from "motion/react";
 import { useMemo } from "react";
 
@@ -65,52 +65,38 @@ export function HomeBlogTeaser({ posts }: Props) {
           .
         </motion.p>
       ) : (
-        <motion.div
-          className="grid gap-4 md:grid-cols-2"
-          variants={gridStagger}
-        >
+        <motion.ul className="flex flex-col" variants={gridStagger}>
           {posts.map((post) => (
-            <motion.article
-              key={post.slug}
-              variants={item}
-              whileHover={
-                reduced
-                  ? undefined
-                  : {
-                      y: -4,
-                      transition: { duration: 0.22, ease: [0.22, 1, 0.36, 1] },
-                    }
-              }
-            >
+            <motion.li key={post.slug} variants={item}>
               <Link
                 href={`/blog/${post.slug}`}
-                className="group flex h-full flex-col overflow-hidden rounded-2xl border border-border-base bg-background transition-[background-color] duration-300 hover:bg-ui-hover active:bg-ui-active"
+                className="group -mx-3 flex items-center gap-3 rounded-lg px-3 py-3 transition-colors hover:bg-ui-hover active:bg-ui-active sm:gap-4"
               >
-                <div className="flex h-full flex-col p-5">
+                <span
+                  className="inline-flex h-5 w-5 shrink-0 items-center justify-center text-text-mute transition-colors group-hover:text-brand"
+                  aria-hidden
+                >
+                  {post.pinned ? (
+                    <Pin className="h-4 w-4" />
+                  ) : (
+                    <FileText className="h-4 w-4" />
+                  )}
+                </span>
+                <h3 className="min-w-0 flex-1 truncate text-[15px] font-medium leading-snug text-text-main transition-colors group-hover:text-brand sm:text-base">
+                  {post.title}
+                </h3>
+                {post.date ? (
                   <time
                     dateTime={post.date}
-                    className="text-xs font-medium text-text-mute"
+                    className="shrink-0 font-mono text-xs text-text-mute sm:text-sm"
                   >
                     {post.date}
                   </time>
-                  <h3 className="mt-3 text-lg font-semibold text-text-main group-hover:text-brand">
-                    {post.title}
-                  </h3>
-                  <p className="mt-2 flex-1 text-sm leading-relaxed text-text-sub">
-                    {post.excerpt}
-                  </p>
-                  <span className="mt-4 inline-flex items-center gap-1 text-sm font-medium text-brand">
-                    Read
-                    <ArrowUpRight
-                      className="h-4 w-4 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
-                      aria-hidden
-                    />
-                  </span>
-                </div>
+                ) : null}
               </Link>
-            </motion.article>
+            </motion.li>
           ))}
-        </motion.div>
+        </motion.ul>
       )}
     </motion.section>
   );
