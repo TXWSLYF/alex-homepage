@@ -44,7 +44,7 @@ export function HomeBlogTeaser({ posts }: Props) {
           <p className="text-xs font-medium uppercase tracking-[0.2em] text-text-mute">
             Blog
           </p>
-          <h2 className="mt-2 text-2xl tracking-tight text-text-main">
+          <h2 className="mt-2 text-2xl font-semibold tracking-tight text-text-main">
             Latest posts
           </h2>
         </div>
@@ -82,7 +82,7 @@ export function HomeBlogTeaser({ posts }: Props) {
                     <FileText className="h-4 w-4" />
                   )}
                 </span>
-                <h3 className="min-w-0 flex-1 truncate text-[15px] font-medium leading-snug text-text-main transition-colors group-hover:text-brand sm:text-base">
+                <h3 className="min-w-0 flex-1 truncate text-[15px] leading-snug text-text-main transition-colors group-hover:text-brand sm:text-base">
                   {post.title}
                 </h3>
                 {post.date ? (
