@@ -44,7 +44,7 @@ export function HomeBlogTeaser({ posts }: Props) {
           <p className="text-xs font-medium uppercase tracking-[0.2em] text-text-mute">
             Blog
           </p>
-          <h2 className="mt-2 text-2xl font-semibold tracking-tight text-text-main">
+          <h2 className="mt-2 text-2xl tracking-tight text-text-main">
             Latest posts
           </h2>
         </div>

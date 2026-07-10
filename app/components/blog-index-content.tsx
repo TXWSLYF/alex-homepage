@@ -48,7 +48,7 @@ export function BlogIndexContent({ posts }: Props) {
                     <FileText className="h-4 w-4" />
                   )}
                 </span>
-                <h2 className="min-w-0 flex-1 truncate text-[15px] font-medium leading-snug text-text-main transition-colors group-hover:text-brand sm:text-base">
+                <h2 className="min-w-0 flex-1 truncate text-[15px] leading-snug text-text-main transition-colors group-hover:text-brand sm:text-base">
                   {post.title}
                 </h2>
                 {post.date ? (
