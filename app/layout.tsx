@@ -30,7 +30,7 @@ function InitialThemeScript() {
     var key = ${storageKey};
     var value = localStorage.getItem(key) || "";
     var root = document.documentElement;
-    var dark = value === "dark";
+    var dark = value !== "light";
 
     root.classList.toggle("dark", dark);
   } catch (e) {}
@@ -49,7 +49,7 @@ export default function RootLayout({
     <html
       lang="en"
       suppressHydrationWarning
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      className={`dark ${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <head>
         <InitialThemeScript />

@@ -28,7 +28,7 @@ function useIsDarkHtml() {
   return useSyncExternalStore(
     subscribeTheme,
     () => document.documentElement.classList.contains("dark"),
-    () => false,
+    () => true,
   );
 }
 
