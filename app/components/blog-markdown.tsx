@@ -3,6 +3,7 @@ import { MarkdownAsync } from "react-markdown";
 import rehypePrettyCode from "rehype-pretty-code";
 import remarkGfm from "remark-gfm";
 import { rehypePrettyCodeOptions } from "@/lib/rehype-pretty-code-options";
+import { rehypeAssignHeadingIds } from "@/lib/rehype-heading-ids";
 import { CodeBlockWithCopy } from "@/app/components/codeblock-with-copy";
 
 function resolveMediaSrc(src: string, slug: string): string {
@@ -94,13 +95,14 @@ function createComponents(slug: string): Components {
 type Props = {
   content: string;
   slug: string;
+  headingIds?: string[];
 };
 
 /**
  * 使用 MarkdownAsync：rehype-pretty-code（Shiki）为异步插件，默认 Markdown 走 runSync 会报错
  * “runSync finished async. Use run instead”。
  */
-export function BlogMarkdown({ content, slug }: Props) {
+export function BlogMarkdown({ content, slug, headingIds = [] }: Props) {
   return (
     <div
       className={[
@@ -117,7 +119,10 @@ export function BlogMarkdown({ content, slug }: Props) {
     >
       <MarkdownAsync
         remarkPlugins={[remarkGfm]}
-        rehypePlugins={[[rehypePrettyCode, rehypePrettyCodeOptions]]}
+        rehypePlugins={[
+          [rehypeAssignHeadingIds, headingIds],
+          [rehypePrettyCode, rehypePrettyCodeOptions],
+        ]}
         components={createComponents(slug)}
       >
         {content}

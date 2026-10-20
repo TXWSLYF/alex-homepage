@@ -114,3 +114,7 @@ code[data-theme*=" "] span {
 html.dark code[data-theme*=" "] span {
   color: var(--shiki-dark);
 }
+
+details[open] .toc-chevron {
+  transform: rotate(180deg);
+}
