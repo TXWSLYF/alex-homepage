@@ -9,12 +9,12 @@ tags:
 featured: false
 draft: false
 ogImage: ""
-description: 从盐、慢哈希到一个可运行的最小密码哈希器：为什么单次 SHA-256 不够，以及生产环境为什么换成 Argon2id。
+description: 从盐、慢哈希到一个可运行的最小密码哈希器：为什么单次 SHA-256 不够，多种算法如何靠头部共存，以及登录时怎样平滑升级。
 ---
 
 明文把密码丢进数据库会怎样？把密码 SHA-256 一下再入库，是不是就安全了？
 
-这篇文章按一条主线展开：**威胁从哪来 → 盐与慢哈希 → 自己实现一个最小 Password Hasher → 校验与升级 → 生产环境该用什么**。
+这篇文章按一条主线展开：**威胁从哪来 → 盐与慢哈希 → 自己实现一个最小 Password Hasher → 多算法共存与懒迁移 → 生产环境该用什么**。
 
 ---
 
@@ -58,7 +58,7 @@ description: 从盐、慢哈希到一个可运行的最小密码哈希器：为�
 
 ### 2.3 密钥派生函数
 
-PBKDF2、bcrypt、scrypt、Argon2 是专门做这件事的函数。第 3 节用标准库里的 PBKDF2 看清输入和输出；第 5 节说明生产环境为什么更常选 Argon2id。
+PBKDF2、bcrypt、scrypt、Argon2 是专门做这件事的函数。第 3 节用标准库里的 PBKDF2 看清输入和输出；第 5 节讲多种算法怎样共存；第 6 节说明生产环境为什么更常选 Argon2id。
 
 ### 2.4 Pepper（可选）
 
@@ -159,15 +159,109 @@ if (!ok) {
 
 失败时不要区分「用户不存在」和「密码错误」。两条路径返回同一句话，减少用登录接口枚举账号。
 
-### 4.1 调高工作因子
+### 4.1 同一算法里调高工作因子
 
-机器会变快。新注册直接用更高的 `ITERATIONS`。旧用户登录成功后，若记录里的轮数低于当前值，用刚刚验证过的密码再调一次 `hashPassword`，把新字符串写回去。参数在字符串里，新旧记录可以并存。
+机器会变快。新注册直接用更高的 `ITERATIONS`。旧用户登录成功后，若记录里的轮数低于当前值，用刚刚验证过的密码再调一次 `hashPassword`，把新字符串写回去。参数写在字符串里，新旧记录可以同时存在。
+
+这是最小的一种升级：算法不变，只改轮数。换成另一种算法时，时机相同，分发方式见第 5 节。
 
 密码只进哈希函数：不写日志，不进错误上报，不出现在查询字符串里。
 
 ---
 
-## 5. 生产环境换掉手写循环
+## 5. 多算法共存与平滑升级
+
+校验不是「全站写死一种算法」。每条哈希自己带着头部，登录时先读头部，再交给对应的校验器。因此 `password_hash` 一列里可以同时躺着 `pbkdf2$...`、`$2b$...` 和 `$argon2id$...`。
+
+> **核心结论：** 混合使用多种算法完全可行。头部让记录自描述，升级靠用户下次登录时顺手重算，而不是强制全员重置密码。
+
+### 5.1 头部让记录自描述
+
+注册或改密时，用**当前**算法生成哈希，把算法名和工作因子一起写入数据库。登录时不看全局配置，只看这一行：
+
+1. **读出**该用户的哈希字符串。
+2. **识别头部** — 看到 `$argon2id$` 走 Argon2，看到 `$2b$` 走 bcrypt，看到 `pbkdf2$` 走第 3 节的校验。
+3. **按该算法的规则**比对密码。
+
+| 头部 | 校验器 |
+| :--- | :--- |
+| `pbkdf2$sha256$...` | 第 3 节的 PBKDF2 |
+| `$2a$` / `$2b$` / `$2y$` | bcrypt |
+| `$argon2id$` | Argon2id |
+
+识别方式就是按 `$` 切开，或对前缀做一次匹配。未知头部直接判失败，不要尝试用默认算法硬解。
+
+### 5.2 升级发生在登录成功的那一次
+
+系统从较弱的算法（或过低的工作因子）换到 Argon2id 时，有两条路：
+
+| 做法 | 结果 |
+| :--- | :--- |
+| **强制重置** | 所有人立刻改密码。流失和客服压力都很大 |
+| **懒迁移** | 新注册、改密用新算法；老用户下次登录成功时再换 |
+
+懒迁移分三步：
+
+1. **新写入一律用当前算法** — 注册和修改密码调用最新的 `hashPassword`。
+2. **校验器继续认识旧算法** — 分发器同时保留 bcrypt、PBKDF2 和 Argon2id，旧行仍能登录。
+3. **登录成功后顺手重算** — 明文密码只在这一刻出现。若头部或工作因子已经过期，用当前算法再哈希一次，覆盖旧值。
+
+离线做不到这件事：旧哈希推不回明文，没有一次成功的登录，就没有重算新哈希的材料。长期不登录的账号会留在旧算法上，这是预期行为，旧校验器要一直留着。
+
+第 4.1 节调高 PBKDF2 轮数，是同一套时机的缩小版。算法变了，或同一种算法的参数低于当前值，都算过期。
+
+### 5.3 包装成一个密码服务
+
+包装成一个密码服务：外面只看到 `hashPassword` 和 `verifyPassword`。`hashPassword` 永远走当前算法；`verifyPassword` 按头部路由。需要写回数据库时，再多一个 `verifyAndUpgrade`。
+
+```javascript
+import { hash as argon2Hash, verify as argon2Verify } from "argon2";
+import bcrypt from "bcrypt";
+
+const CURRENT = "argon2id";
+
+function detectScheme(stored) {
+  if (stored.startsWith("$argon2id$")) return "argon2id";
+  if (
+    stored.startsWith("$2a$") ||
+    stored.startsWith("$2b$") ||
+    stored.startsWith("$2y$")
+  ) {
+    return "bcrypt";
+  }
+  if (stored.startsWith("pbkdf2$")) return "pbkdf2";
+  return null;
+}
+
+export async function hashPassword(password) {
+  return argon2Hash(password);
+}
+
+export async function verifyPassword(password, stored) {
+  const scheme = detectScheme(stored);
+  if (scheme === "argon2id") return argon2Verify(stored, password);
+  if (scheme === "bcrypt") return bcrypt.compare(password, stored);
+  if (scheme === "pbkdf2") return verifyPbkdf2(password, stored);
+  return false;
+}
+
+export async function verifyAndUpgrade(password, stored) {
+  const ok = await verifyPassword(password, stored);
+  if (!ok) return { ok: false, next: null };
+
+  const outdated = detectScheme(stored) !== CURRENT;
+  return {
+    ok: true,
+    next: outdated ? await hashPassword(password) : null,
+  };
+}
+```
+
+`verifyPbkdf2` 就是第 3 节的 `verifyPassword`。`next` 不是 `null` 时，登录成功的同一事务里把 `password_hash` 更新成新字符串。调用方仍然只收到「匹配或不匹配」，升级是校验通过之后的副作用。
+
+---
+
+## 6. 生产环境换掉手写循环
 
 PBKDF2 适合把盐、轮数、存储格式讲清楚，很多系统用它也够。它主要靠 CPU 轮数减速，专用硬件可以并行堆算力。内存困难函数还会占住一块内存，并行度上不去。
 
@@ -181,23 +275,24 @@ PBKDF2 适合把盐、轮数、存储格式讲清楚，很多系统用它也够�
 
 > **核心结论：** 自己实现是为了看清盐、工作因子和存储格式。上线用经过审计的 **Argon2id**（或 bcrypt）库，不要发明新的哈希算法。
 
-参数跟着 [OWASP Password Storage Cheat Sheet](https://cheatsheetseries.owasp.org/cheatsheets/Password_Storage_Cheat_Sheet.html) 当时的建议走，再在部署机器上量一次延迟。算法名和参数照第 3 节的方式写进存储字符串，以后才能平滑换代。
+参数跟着 [OWASP Password Storage Cheat Sheet](https://cheatsheetseries.owasp.org/cheatsheets/Password_Storage_Cheat_Sheet.html) 当时的建议走，再在部署机器上量一次延迟。算法名和参数照第 3 节写进存储字符串，换代步骤按第 5 节做懒迁移。
 
 ---
 
-## 6. 总结
+## 7. 总结
 
-密码哈希可以记成五道关：
+密码哈希可以记成六道关：
 
 | 关卡 | 名称 | 要点 |
 | :---: | :--- | :--- |
 | 1 | **盐** | 每用户随机，相同密码得到不同结果 |
 | 2 | **慢哈希** | 工作因子写进存储字符串 |
 | 3 | **校验** | 常量时间比较；错误信息不分流 |
-| 4 | **升级** | 登录成功后按当前参数重哈希 |
-| 5 | **生产** | Argon2id，参数跟随 OWASP |
+| 4 | **头部** | 先认算法，再调用对应校验器 |
+| 5 | **懒迁移** | 登录成功后用当前算法覆盖旧哈希 |
+| 6 | **生产** | Argon2id，参数跟随 OWASP |
 
 日常再记两条：
 
-- **密码只进哈希函数** → 不进日志、不进错误上报
-- **算法和参数跟哈希存在一起** → 以后换算法不用迁移脚本猜格式
+- **不要为了换算法强制重置** → 新写入用当前算法，旧校验器留着，登录成功时升级
+- **算法和参数跟哈希存在一起** → 同一列里多种格式可以长期共存
