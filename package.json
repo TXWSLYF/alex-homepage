@@ -2,6 +2,7 @@
   "name": "alex-homepage",
   "version": "0.1.0",
   "private": true,
+  "packageManager": "pnpm@9.15.5",
   "scripts": {
     "dev": "next dev",
     "prebuild": "node scripts/copy-blog-media.mjs && node scripts/gallery.mjs build-json",
