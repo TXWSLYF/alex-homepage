@@ -1,3 +1,5 @@
+import type { ReactNode } from "react";
+import { Children, isValidElement } from "react";
 import type { Components } from "react-markdown";
 import { MarkdownAsync } from "react-markdown";
 import rehypePrettyCode from "rehype-pretty-code";
@@ -5,6 +7,12 @@ import remarkGfm from "remark-gfm";
 import { rehypePrettyCodeOptions } from "@/lib/rehype-pretty-code-options";
 import { rehypeAssignHeadingIds } from "@/lib/rehype-heading-ids";
 import { CodeBlockWithCopy } from "@/app/components/codeblock-with-copy";
+import {
+  CommandAwareCell,
+  CommandTable,
+  IndexedRow,
+  MaybeCopyableCode,
+} from "@/app/components/command-table-copy";
 
 function resolveMediaSrc(src: string, slug: string): string {
   const trimmed = src.trim();
@@ -24,6 +32,44 @@ function isBlockCode(props: {
     Boolean(props.className?.includes("language-")) ||
     typeof props["data-theme"] === "string"
   );
+}
+
+function nodeText(node: ReactNode): string {
+  if (typeof node === "string" || typeof node === "number") return String(node);
+  if (Array.isArray(node)) return node.map(nodeText).join("");
+  if (isValidElement(node)) {
+    const props = node.props as { children?: ReactNode };
+    return nodeText(props.children);
+  }
+  return "";
+}
+
+/** Column indexes whose header is 「命令」, so only cheat-sheet commands get a copy button. */
+function commandColumnIndexes(children: ReactNode): number[] {
+  const indexes: number[] = [];
+  Children.forEach(children, (section) => {
+    if (!isValidElement(section) || section.type !== "thead") return;
+    const rows = (section.props as { children?: ReactNode }).children;
+    Children.forEach(rows, (row) => {
+      if (!isValidElement(row)) return;
+      const cells = (row.props as { children?: ReactNode }).children;
+      let index = 0;
+      Children.forEach(cells, (cell) => {
+        if (isValidElement(cell)) {
+          const text = nodeText(
+            (cell.props as { children?: ReactNode }).children,
+          )
+            .replace(/\s+/g, " ")
+            .trim();
+          if (text === "命令" || text.toLowerCase() === "command") {
+            indexes.push(index);
+          }
+        }
+        index += 1;
+      });
+    });
+  });
+  return indexes;
 }
 
 function createComponents(slug: string): Components {
@@ -60,14 +106,20 @@ function createComponents(slug: string): Components {
       {children}
     </figure>
     ),
-    table: ({ children, ...props }) => (
-    <div className="my-6 max-w-full overflow-x-auto">
-      <table className="w-max min-w-full border-collapse text-left text-sm" {...props}>
+    table: ({ children, node: _node, ...props }) => (
+      <CommandTable columns={commandColumnIndexes(children)} {...props}>
         {children}
-      </table>
-    </div>
+      </CommandTable>
     ),
-    code: ({ className, children, ...props }) => {
+    tr: ({ children, node: _node, ...props }) => (
+      <tr {...props}>
+        <IndexedRow>{children}</IndexedRow>
+      </tr>
+    ),
+    td: ({ children, node: _node, ...props }) => (
+      <CommandAwareCell {...props}>{children}</CommandAwareCell>
+    ),
+    code: ({ className, children, node: _node, ...props }) => {
     if (isBlockCode({ className, ...props })) {
       return (
         <code className={className} {...props}>
@@ -75,14 +127,7 @@ function createComponents(slug: string): Components {
         </code>
       );
     }
-    return (
-      <code
-        className="rounded bg-surface-muted px-1.5 py-0.5 font-mono text-[0.9em] text-text-main"
-        {...props}
-      >
-        {children}
-      </code>
-    );
+    return <MaybeCopyableCode className={className}>{children}</MaybeCopyableCode>;
     },
     pre: ({ children, className, ...props }) => (
       <CodeBlockWithCopy className={className} {...props}>
